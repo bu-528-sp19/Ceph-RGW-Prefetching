@@ -54,7 +54,7 @@ Developer - Human - A developer that handles the design of the prefetching mecha
 
 Prefetching mechanism - Nonhuman - Synchronizes the remaining parts of the accessed file to the cache making available per request.
 
-User interface - Nonhuman - A graphical interface to allow system admins to view the status of the cache.
+User interface - Nonhuman - A command-line interface to allow system admins to view the status of the cache.
 
 
 
