@@ -48,7 +48,7 @@ The final implementation will be a part of Ceph project through upstream process
 
 
 ## Scope and Features Of The Project
-To develop a prefetching mechanism which intends to improve the current state of reading files from DSS. The goal for this project is to provide a mechanism that will complement the current performance of the cache by retrieving the chunks of the accessed file preceding the request operation for that particular file. These two approaches a cache working standalone or a cache integrated with a prefetching mechanism should be compared and evaluated in terms of performance. In addition, a useful interface for system admins should be developed which determines the status of the cache.
+To develop a prefetching mechanism which intends to improve the current state of reading files from DSS. The goal for this project is to provide a mechanism that will complement the current performance of the cache by retrieving the chunks of the accessed file preceding the request operation for that particular file. These two approaches a cache working standalone or a cache integrated with a prefetching mechanism should be compared and evaluated in terms of performance. In addition, a more interactive interface for system admins should be developed which determines the status of the cache.
 
 ## Solution Concept
 
