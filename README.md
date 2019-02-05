@@ -40,11 +40,24 @@ Unfortunately, Ceph does not support caching data. As a result, a team of studen
 
 ## Goals of this Project
 The natural step after developing the caching system for Ceph is to develop prefetching mechanism. Since the majority of data has spatial locality, prefetching next (sequentially located) data can increase the Ceph performance. In this project, we will develop:
-A simple prefetching system for Ceph. This system will figure out which file is accessed and will prefetch the remaining parts of the file before actual request. By the time of receiving the request for the remaining parts, the data is ready and therefore the user wait time will be reduced. This system will be a part of upstream Ceph code.
-A mechanism to evaluate the overall performance of Ceph while the prefetching system is in place. We will design and deploy a scenario to find out how good the new prefetching system is.
-A system to check the content of cache. It would be very helpful for system administrator and users (if they had the access right) to check the content of cache and analyze the access pattern. This part of project can help to design a more intelligent caching and prefetching systems.
+- A simple prefetching system for Ceph. This system will figure out which file is accessed and will prefetch the remaining parts of the file before actual request. By the time of receiving the request for the remaining parts, the data is ready and therefore the user wait time will be reduced. This system will be a part of upstream Ceph code.
+- A mechanism to evaluate the overall performance of Ceph while the prefetching system is in place. We will design and deploy a scenario to find out how good the new prefetching system is.
+- A system to check the content of cache. It would be very helpful for system administrator and users (if they had the access right) to check the content of cache and analyze the access pattern. This part of project can help to design a more intelligent caching and prefetching systems.
 
 The final implementation will be a part of Ceph project through upstream process. As a result, the team will follow production level coding as much as possible. In this manner, the coding quality should be acceptable by the open source community.
+
+
+## Users/Personas Of The Project
+User - Human - Users that wish to store a file in a distributed storage system.
+
+Developer - Human - A developer that handles the design of the prefetching mechanism and ensures its streamliness with the current caching system.
+
+Prefetching mechanism - Nonhuman - Synchronizes the remaining parts of the accessed file to the cache making available per request.
+
+User interface - Nonhuman - A graphical interface to allow system admins to view the status of the cache.
+
+
+
 
 
 ## Scope and Features Of The Project
