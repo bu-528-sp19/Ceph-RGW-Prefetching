@@ -2,14 +2,12 @@
 
 ## Introduction, Vision, and Goals Of The Project
 
-The amount of produced data every day is around 2.5 exabyte of data. This data is generated through the Internet, Social Media, Communication, Digital Photos, IoT and etc. The pace of generating data is only accelerating with the growth of using various digital services. Over the last two years alone 90 percent of the data in the world was generated.
+Every day, we are creating around 2.5 exabytes of data. This data is generated through the Internet, Social Media, Communication, Digital Photos, IoT and etc. We are generating data on an exponential rate, in the last two years alone 90 percent of the world data was generated.
 
-Storing data has evolved during the years in order to accommodate the rising needs of companies and individuals. The traditional approach to storage – a standalone, specialized storage system – no longer works, for both technical and economic reasons. 
-
-The pace of generating data not only needs faster drives and networks, but it also needs a new approach to store data. Distributed Storage System (DSS) is a storing method which solves most of the present problems. We can define distributed data storage as “Storing data on a multitude of standard servers, which behave as one storage system although data is distributed between these servers.”
-
+We need more and more sophisticated storage systems (hardware and software) to deal with the enormous amount of data and to meet the requirement of modern day applications. Storing data has evolved during the years in order to accommodate the rising needs. The traditional approach to storage – a standalone, specialized storage system – no longer works, for both technical and economic reasons. Over the last 2 decades, researchers have developed distributed storage systems, which not only can store enormous amounts of data but also meet the requirements of modern day applications. 
 A distributed storage system can relate to any of the 3 types of storage: block, file, and object. In the case of block-level storage systems “distributed data storage” typically relates to one storage system in a tight geographical area, usually located in one data center, since performance demands are very high. In the case of object-storage systems – they can be both in one location or more locations and here geographically a distributed storage system could work, as the requirements on performance are not as high as for block-level storage. File storage falls in between, depending on the workload the user of the system is running.
 
+Ceph is one such distributed storage system which provides excellent performance, reliability, and scalability. Ceph uses the intelligent storage units (OSDs) which combine a CPU, network interface, local cache, and a disk. Cephs orchestrates the data storage and retrieval from these OSDs using other integral components of Ceph i.e. monitors, metadata servers, gateways, and their pseudo-random algorithm CRUSH. More details about the Ceph architect can be found [here](http://docs.ceph.com/docs/dumpling/architecture/).  
 
 ## How does a distributed storage system alleviate the current problems?
 
