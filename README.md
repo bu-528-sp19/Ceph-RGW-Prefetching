@@ -4,36 +4,47 @@
 
 Every day, we are creating around 2.5 exabytes of data. This data is generated through the Internet, Social Media, Communication, Digital Photos, IoT and etc. We are generating data on an exponential rate, in the last two years alone 90 percent of the world data was generated.
 
-We need more and more sophisticated storage systems (hardware and software) to deal with the enormous amount of data and to meet the requirement of modern day applications. Storing data has evolved during the years in order to accommodate the rising needs. The traditional approach to storage – a standalone, specialized storage system – no longer works, for both technical and economic reasons. Over the last 2 decades, researchers have developed distributed storage systems, which not only can store enormous amounts of data but also meet the requirements of modern day applications. 
+We need more and more sophisticated storage systems (hardware and software) to deal with the enormous amount of data and to meet the requirement of modern day applications. Storing data has evolved during the years in order to accommodate the rising needs. The traditional approach to storage – a standalone, specialized storage system – no longer works, for both technical and economic reasons. Over the last 2 decades, researchers have developed distributed storage systems (DSS), which not only can store enormous amounts of data but also meet the requirements of modern day applications. 
 
 A distributed storage system can relate to any of the 3 types of storage: block, file, and object. In the case of block-level storage systems “distributed data storage” typically relates to one storage system in a tight geographical area, usually located in one data center, since performance demands are very high. In the case of object-storage systems – they can be both in one location or more locations and here geographically a distributed storage system could work, as the requirements on performance are not as high as for block-level storage. File storage falls in between, depending on the workload the user of the system is running.
-
-Ceph is one such distributed storage system which provides excellent performance, reliability, and scalability. Ceph uses the intelligent storage units (OSDs) which combine a CPU, network interface, local cache, and a disk. Cephs orchestrates the data storage and retrieval from these OSDs using other integral components of Ceph i.e. monitors, metadata servers, gateways, and their pseudo-random algorithm CRUSH. More details about the Ceph architect can be found [here](http://docs.ceph.com/docs/dumpling/architecture/).  
+  
 
 ## How does a distributed storage system alleviate the current problems?
 
 ### 1- Flexibility and scalability
-Distributed storage systems use standard servers. It no longer requires a specialized box, to handle just the storage function. This allows scaling by adding more servers and thus increasing capacity and performance linearly. Also, DSS not only allows to have converged/hyper-converged infrastructure, but also allows to keep compute or storage separate on different nodes as well.
+Distributed storage systems use standard hardware to store data. It no longer requires a specialized box, to handle just the storage function. This allows scaling by adding more storage units and thus increasing capacity and performance linearly. 
 
 ### 2- Speed
-In a distributed storage system, any node can read and write in parallel increasing to overall performance of the storage system comparing to a standalone system.
+In a distributed storage system, any node can read and write in parallel increasing the overall throughput of the system as compared to standalone single device.
 
 ### 3- Cost
- DSS uses standard servers, drives, and network, which are less expensive. In addition, DSS is simpler to manage, which means less staff would be required to run the IT infrastructure.
+DSS are built using standard servers, drives, and network components, which are less expensive. In addition, DSS is simpler to manage, which means less staff would be required to run the IT infrastructure.
 
 ## Ceph
-One of the distributed storage systems is Ceph. it is an open source storage platform, implements object storage on a single distributed computer cluster, and provides interfaces for object-, block- and file-level storage. Ceph aims primarily for completely distributed operation without a single point of failure, scalable to the exabyte level, and freely available.
 
-Ceph replicates data and makes it fault-tolerant, using commodity hardware and requiring no specific hardware support. As a result of its design, the system is both self-healing and self-managing, aiming to minimize administration time and other costs.
+Ceph is a open source - distributed storage system which provides excellent performance, reliability, and scalability. Ceph uses the intelligent storage units (OSDs) which combine a CPU, network interface, local cache, and a disk. Cephs orchestrates the data storage and retrieval from these OSDs using other integral components of Ceph i.e. monitors, metadata servers, gateways, and their pseudo-random algorithm CRUSH. More details about the Ceph architect can be found [here](http://docs.ceph.com/docs/dumpling/architecture/).
+
+Ceph provides interfaces for object-, block- and file-level storage. Ceph aims primarily for completely distributed operation hence not prone to single point of failure.
 
 
+### Ceph Architecture
+It consists of the following components;
 
+#### RADOS 
+RADOS is a reliable, autonomous, distributed object store comprised of self healing and self managing intelligent storeged nodes (OSDs, Monitors, Metadata servers are all part of RADOS)
+#### LIBRADOS
+A library that allows application to directly access RADOS.
+#### RADOSGW 
+A bucket based REST gateway built on top of LIBRADOS, which is also compatible with S3 and Swift.
+#### RBD 
+A reliable and fully distributed block device with a Linux kernal client and a QEMU/KVM driver.
+#### CephFS
+The Ceph Filesystem (CephFS) provides a POSIX-compliant filesystem as a service that is layered on top of the object-based Ceph Storage Cluster. 
 
-### Ceph Object Storage
-The Ceph Object Storage daemon, radosgw (RGW), is a FastCGI service that provides a RESTful HTTP API to access the data. It layers on top of the Ceph Storage Cluster with its own data formats, and maintains its own user database, authentication, and access control. The RGW uses a unified namespace, which means users can use either the OpenStack Swift-compatible API or the Amazon S3-compatible API. For example, the user can write data using the S3-compatible API with one application and then read data using the Swift-compatible API with another application.
+As our project mainly deals with the radosgw component. We will explain that in more details here. The Ceph Object Storage daemon, radosgw (RGW), is a FastCGI service that provides a RESTful HTTP API to access the data. It layers on top of the Ceph Storage Cluster with its own data formats, and maintains its own user database, authentication, and access control. The RGW uses a unified namespace, which means users can use either the OpenStack Swift-compatible API or the Amazon S3-compatible API. For example, the user can write data using the S3-compatible API with one application and then read data using the Swift-compatible API with another application.
 
 ### Making Ceph faster
-Due to the spatial locality and temporal locality of data, caching and prefetching are effective methods to improve the I/O performance. Prefetching the data and then caching them on the clients can effectively reduce the number of data requests and dramatically cutting down on the latency to access data, thus resulting in an overall better quality of service (QoS).
+Due to the spatial locality and temporal locality of data, caching and prefetching are effective methods to improve the I/O performance. Prefetching the data and then caching it on the gateway can dramatically cutting down on the latency to access data, thus resulting in an overall better throughput and quality of service (QoS).
 
 Unfortunately, Ceph does not support caching data. As a result, a team of students in Mass Open Cloud (MOC) designed and developed a new two-layer caching system to make Ceph more efficient. This system deploys caching system in RGW machine improving overall Ceph performance.
 
@@ -54,10 +65,6 @@ Developer - Human - A developer that handles the design of the prefetching mecha
 Prefetching mechanism - Nonhuman - Synchronizes the remaining parts of the accessed file to the cache making available per request.
 
 User interface - Nonhuman - A command-line interface to allow system admins to view the status of the cache.
-
-
-
-
 
 ## Scope and Features Of The Project
 To develop a prefetching mechanism which intends to improve the current state of reading files from DSS. The goal for this project is to provide a mechanism that will complement the current performance of the cache by retrieving the chunks of the accessed file preceding the request operation for that particular file. These two approaches a cache working standalone or a cache integrated with a prefetching mechanism should be compared and evaluated in terms of performance. In addition, a more interactive interface for system admins should be developed which determines the status of the cache.
