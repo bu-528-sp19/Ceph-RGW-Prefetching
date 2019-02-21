@@ -15,14 +15,14 @@ A distributed storage system can relate to any of the 3 types of storage: block,
 Distributed storage systems use standard hardware to store data. It no longer requires a specialized box, to handle just the storage function. This allows scaling by adding more storage units and thus increasing capacity and performance linearly. 
 
 ### 2- Speed
-In a distributed storage system, any node can read and write in parallel increasing the overall throughput of the system as compared to standalone single device.
+In a distributed storage system, any node can read and write in parallel increasing the overall throughput of the system as compared to a standalone single device.
 
 ### 3- Cost
-DSS are built using standard servers, drives, and network components, which are less expensive. In addition, DSS is simpler to manage, which means less staff would be required to run the IT infrastructure.
+DSS is built using standard servers, drives, and network components, which are less expensive. In addition, DSS is simpler to manage, which means less staff would be required to run the IT infrastructure.
 
 ## Ceph
 
-Ceph is a open source - distributed storage system which provides excellent performance, reliability, and scalability. Ceph uses the intelligent storage units (OSDs) which combine a CPU, network interface, local cache, and a disk. Cephs orchestrates the data storage and retrieval from these OSDs using other integral components of Ceph i.e. monitors, metadata servers, gateways, and their pseudo-random algorithm CRUSH. More details about the Ceph architect can be found [here](http://docs.ceph.com/docs/dumpling/architecture/).
+Ceph is an open source - distributed storage system which provides excellent performance, reliability, and scalability. Ceph uses the intelligent storage units (OSDs) which combine a CPU, network interface, local cache, and a disk. Cephs orchestrates the data storage and retrieval from these OSDs using other integral components of Ceph i.e. monitors, metadata servers, gateways, and their pseudo-random algorithm CRUSH. More details about the Ceph architect can be found [here](http://docs.ceph.com/docs/dumpling/architecture/).
 
 Ceph provides interfaces for object-, block- and file-level storage. Ceph aims primarily for completely distributed operation hence not prone to single point of failure.
 
@@ -31,30 +31,29 @@ Ceph provides interfaces for object-, block- and file-level storage. Ceph aims p
 It consists of the following components;
 
 #### RADOS 
-RADOS is a reliable, autonomous, distributed object store comprised of self healing and self managing intelligent storeged nodes (OSDs, Monitors, Metadata servers are all part of RADOS)
+RADOS is a reliable, autonomous, distributed object store comprised of self-healing, self-managing and intelligent storage nodes (OSDs, Monitors, Metadata servers are all part of RADOS)
 #### LIBRADOS
-A library that allows application to directly access RADOS.
+A library that allows an application to directly access RADOS.
 #### RADOSGW 
 A bucket based REST gateway built on top of LIBRADOS, which is also compatible with S3 and Swift.
 #### RBD 
-A reliable and fully distributed block device with a Linux kernal client and a QEMU/KVM driver.
+A reliable and fully distributed block device with a Linux kernel client and a QEMU/KVM driver.
 #### CephFS
 The Ceph Filesystem (CephFS) provides a POSIX-compliant filesystem as a service that is layered on top of the object-based Ceph Storage Cluster. 
 
-As our project mainly deals with the radosgw component. We will explain that in more details here. The Ceph Object Storage daemon, radosgw (RGW), is a FastCGI service that provides a RESTful HTTP API to access the data. It layers on top of the Ceph Storage Cluster with its own data formats, and maintains its own user database, authentication, and access control. The RGW uses a unified namespace, which means users can use either the OpenStack Swift-compatible API or the Amazon S3-compatible API. For example, the user can write data using the S3-compatible API with one application and then read data using the Swift-compatible API with another application.
+As our project mainly deals with the radosgw component. We will explain that in more details here. The Ceph Object Storage daemon, radosgw (RGW), is a FastCGI service that provides a RESTful HTTP API to access the data. It layers on top of the Ceph Storage Cluster with its own data formats and maintains its own user database, authentication, and access control. The RGW uses a unified namespace, which means users can use either the OpenStack Swift-compatible API or the Amazon S3-compatible API. For example, the user can write data using the S3-compatible API with one application and then read data using the Swift-compatible API with another application.
 
-### Making Ceph faster
-Due to the spatial locality and temporal locality of data, caching and prefetching are effective methods to improve the I/O performance. Prefetching the data and then caching it on the gateway can dramatically cutting down on the latency to access data, thus resulting in an overall better throughput and quality of service (QoS).
+### Making Ceph Faster
+Due to the spatial locality and temporal locality of data being requested by applications, caching and prefetching are effective methods to improve the performance of a distributed system. Prefetching the data and then caching it on the gateway can dramatically cut down on the latency to access data, thus resulting in an overall better overall throughput and quality of service (QoS).
 
-Unfortunately, Ceph does not support caching data. As a result, a team of students in Mass Open Cloud (MOC) designed and developed a new two-layer caching system to make Ceph more efficient. This system deploys caching system in RGW machine improving overall Ceph performance.
+Unfortunately, Ceph does not support caching data. As a result, a team of students in Mass Open Cloud (MOC) designed and developed a new two-layer caching system in RGW to make Ceph more efficient.
 
 ## Goals of this Project
-The natural step after developing the caching system for Ceph is to develop prefetching mechanism. Since the majority of data has spatial locality, prefetching next (sequentially located) data can increase the Ceph performance. In this project, we will develop:
-- A simple prefetching system for Ceph. This system will figure out which file is accessed and will prefetch the remaining parts of the file before actual request. By the time of receiving the request for the remaining parts, the data is ready and therefore the user wait time will be reduced. This system will be a part of upstream Ceph code.
-- A mechanism to evaluate the overall performance of Ceph while the prefetching system is in place. We will design and deploy a scenario to find out how good the new prefetching system is.
-- A system to check the content of cache. It would be very helpful for system administrator and users (if they had the access right) to check the content of cache and analyze the access pattern. This part of project can help to design a more intelligent caching and prefetching systems.
-
-The final implementation will be a part of Ceph project through upstream process. As a result, the team will follow production level coding as much as possible. In this manner, the coding quality should be acceptable by the open source community.
+The natural step after developing the caching system for Ceph is to develop a prefetching mechanism. Since the majority of data has spatial locality, prefetching next (sequentially located) data can increase the Ceph performance. Following are the goals of our projects,
+- Design and develop a prefetching mechanism for Ceph. We will also be integrating the prefetching with previously implemented two-level cache in Ceph.
+- We will also be developing a mechanism to evaluate the performance of Ceph with/without the prefetching system.
+- We are also hoping to develop commands/API to monitor the state of the previously implemented caching system.
+The final implementation will be a part of the Ceph project through the upstream process. As a result, the team will follow production level coding as much as possible. In this manner, the coding quality should be acceptable by the open source community.
 
 
 ## Users/Personas Of The Project
