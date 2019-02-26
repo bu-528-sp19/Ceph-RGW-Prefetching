@@ -2142,6 +2142,11 @@ struct get_obj_data : public RefCountedObject {
   Throttle throttle;
   list<bufferlist> read_list;
 
+  /*** AMIN CODE START ***/
+  size_t obj_size;
+  /*** AMIN CODE END ***/
+
+
   int sequence;
   Mutex cache_lock;
   Mutex l2_lock;
@@ -2151,6 +2156,7 @@ struct get_obj_data : public RefCountedObject {
 
   get_obj_data(CephContext *_cct);
   ~get_obj_data(); 
+  void add_pending_oid(std::string oid);
   void set_cancelled(int r);
   bool is_cancelled();
   int get_err_code();
@@ -3294,12 +3300,15 @@ public:
   virtual bool chain_cache_entry(std::initializer_list<rgw_cache_entry_info*> cache_info_entries,
 				 RGWChainedCache::Entry *chained_entry) { return false; }
 
-  int iterate_obj(RGWObjectCtx& ctx,
+  /*** AMIN CODE START ***/
+  virtual int iterate_obj(RGWObjectCtx& ctx,
                   const RGWBucketInfo& bucket_info, const rgw_obj& obj,
                   off_t ofs, off_t end,
                   uint64_t max_chunk_size,
                   int (*iterate_obj_cb)(const RGWBucketInfo& bucket_info, const rgw_obj& obj, const rgw_raw_obj&, off_t, off_t, off_t, bool, RGWObjState *, void *),
                   void *arg);
+
+  /*** AMIN CODE END ***/
 
   int append_atomic_test(RGWObjectCtx *rctx, const RGWBucketInfo& bucket_info, const rgw_obj& obj,
 		  librados::ObjectOperation& op, RGWObjState **state);

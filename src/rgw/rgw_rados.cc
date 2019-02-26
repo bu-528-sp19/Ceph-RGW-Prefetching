@@ -10184,7 +10184,7 @@ static void _get_obj_aio_completion_cb(completion_t cb, void *arg);
 get_obj_data::get_obj_data(CephContext *_cct)
   : cct(_cct),
   rados(NULL), ctx(NULL),
-  total_read(0), lock("get_obj_data"), data_lock("get_obj_data::data_lock"),
+  total_read(0), lock("get_obj_data"), data_lock("get_obj_data::data_lock"), obj_size(0),
   client_cb(NULL),
   cache_lock("get_obj_data::cache_lock"), 
   l2_lock("get_obj_data::l2_lock"),
@@ -10363,6 +10363,11 @@ string get_obj_data::deterministic_hash(string oid) {
   vector<string> sv = split(oid, "_");
   int hash = std::stoi(sv[sv.size()-1], &sz);
   return tokens[hash%mod];
+}
+
+void get_obj_data::add_pending_oid(std::string oid)
+{
+  pending_oid_list.push_back(oid);
 }
 
 
@@ -10694,6 +10699,10 @@ int RGWRados::Object::Read::iterate(int64_t ofs, int64_t end, RGWGetDataCB *cb)
   data->rados = store;
   data->io_ctx.dup(state.io_ctx);
   data->client_cb = cb;
+
+  /*** AMIN CODE START***/
+  data->obj_size  =  *params.obj_size; //cb->submit_l2_request();
+  /*** AMIN CODE END***/
 
   int r = store->iterate_obj(obj_ctx, source->get_bucket_info(), state.obj, ofs, end, cct->_conf->rgw_get_obj_max_req_size, _get_obj_iterate_cb, (void *)data);
   if (r < 0) {
@@ -13856,6 +13865,9 @@ RGWRados *RGWStoreManager::init_storage_provider(CephContext *cct, bool use_gc_t
 						 bool quota_threads, bool run_sync_thread, bool run_reshard_thread, bool use_metacache, bool use_datacache)
 {
   RGWRados *store = NULL;
+
+  /*** AMIN CODE ***/
+  use_datacache = true;
   if (use_datacache) {
     store = new RGWDataCache<RGWRados>;
   }

@@ -377,6 +377,7 @@ DataCache::DataCache ()
   : index(0), lock("DataCache"), cache_lock("DataCache::Mutex"), req_lock("DataCache::req"), eviction_lock("DataCache::EvictionMutex"), cct(NULL), io_type(ASYNC_IO), free_data_cache_size(0), outstanding_write_size (0)
 {
   tp = new L2CacheThreadPool(32);
+  tp_pf = new L2CacheThreadPool(8);
 }
 
 int DataCache::io_write(bufferlist& bl ,unsigned int len, std::string oid) {
@@ -757,3 +758,120 @@ int HttpL2Request::sign_request(RGWAccessKey& key, RGWEnv& env, req_info& info)
 
   return 0;
 }
+
+
+/*** AMIN CODE START ***/
+void DataCache::issue_prefetch(get_obj_data *d, off_t ofs, unsigned int len)
+{
+
+  string auth_token;
+  string req_uri;
+  string dest;
+  //cct->_conf->rgw_host,
+  ((RGWGetObj_CB *)(d->client_cb))->get_req_info(dest, req_uri, auth_token);
+
+  // FIXME: you have to delete the req object
+  
+  PrefetchReq *req = new PrefetchReq;
+  req->auth_token = auth_token;
+  req->uri = "http://" + dest + req_uri;
+  req->ofs = ofs;
+  req->len = len;
+
+  if (req_uri.compare("/auth/1.0") != 0) 
+    tp_pf->addTask(new HttpPrefetchRequest(req, cct));
+  else
+    delete req;
+  
+}
+
+void HttpPrefetchRequest::run() {
+
+  int n_retries =  cct->_conf->rgw_l2_request_thread_num;
+  int r = 0;
+  
+  for (int i=0; i<n_retries; i++ ){
+    if(!(r = submit_http_request())){
+      //FIXME : update cache
+      //d->cache_aio_completion_cb(req);
+      return;
+    }
+    if (r == ECANCELED) {
+      return;
+    }
+
+  }
+}
+
+
+static size_t _prefetch_response_cb(void *ptr, size_t size, size_t nmemb, void* param) {
+  PrefetchReq *req = static_cast<PrefetchReq *>(param);
+  //FIXME
+  //req->pbl->append((char *)ptr, size*nmemb);
+  return size*nmemb;
+}
+
+int HttpPrefetchRequest::submit_http_request () {
+
+  CURLcode res;
+  string range = std::to_string(req->ofs)+ "-"+ std::to_string(req->len);
+  struct curl_slist *header = NULL;
+
+  /* FIXME: ASK MATT: hot to sign a S3 request with authentication */
+  /*
+  if (false){ // (s->dialect == "s3") {
+    RGWEnv env;
+    req_info info(cct, &env);
+    memcpy(&info, &s->info, sizeof(info));
+    memcpy(&env, s->info.env, sizeof(env));
+    info.env = &env;
+    std::string access_key_id;
+    if (true) { //(!s->http_auth || !(*s->http_auth)) { FIXME: The S3 Authentication has been changed! FIX IT
+      access_key_id = s->info.args.get("AWSAccessKeyId");
+    } else {
+      //string auth_str(s->http_auth + 4); FIXME: The S3 Authentication has been changed! FIX IT
+      string auth_str("auth");
+      int pos = auth_str.rfind(':');
+      if (pos < 0)
+        return -EINVAL;
+      access_key_id = auth_str.substr(0, pos);
+    }
+    map<string, RGWAccessKey>::iterator iter = s->user->access_keys.find(access_key_id);
+    if (iter == s->user->access_keys.end()) {
+      ldout(cct, 1) << "ERROR: access key not encoded in user info" << dendl;
+      return -EPERM;
+    }
+   RGWAccessKey& key = iter->second;
+   sign_request(key, env, info);
+  } else*/ if(true){ //(s->dialect == "swift") {
+    header = curl_slist_append(header, req->auth_token.c_str());
+  } else {
+    ldout(cct, 10) << "Engage1: curl_easy_perform() failed " << dendl;
+    return -1;
+  }
+
+
+  if(curl_handle) {
+    curl_easy_setopt(curl_handle, CURLOPT_RANGE, range.c_str());
+    curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, header); 
+    curl_easy_setopt(curl_handle, CURLOPT_URL, req->uri.c_str());
+    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L); 
+    curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, _prefetch_response_cb);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void*)req);
+    res = curl_easy_perform(curl_handle); 
+    curl_easy_reset(curl_handle);
+    curl_slist_free_all(header);
+  }
+  if(res != CURLE_OK)
+  {
+    ldout(cct, 10) << "Engage1: curl_easy_perform() failed " << curl_easy_strerror(res)  << dendl;
+    return -1;
+  }
+  return 0;
+}
+
+
+
+
+/*** AMIN CODE END ***/
