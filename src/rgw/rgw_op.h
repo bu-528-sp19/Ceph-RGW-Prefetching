@@ -323,7 +323,7 @@ public:
   int submit_l2_request(string dest, off_t obj_ofs, size_t len, off_t read_ofs, void* args, size_t (*write_cb)(void *, size_t, size_t, void *)){
     return s->submit_http_req(dest, obj_ofs, len, read_ofs, args, write_cb);
   }
-  int get_req_info(string dest, string& uri, string& auth_token) {
+  int get_req_info(string &dest, string& uri, string& auth_token) {
     return s->get_req_info(dest, uri, auth_token);
   }
   bool get_cache_request() {
@@ -365,7 +365,7 @@ public:
     return (op->submit_l2_request(dest, obj_ofs, len, read_ofs, args, write_cb));
   }
 
-  int get_req_info(string dest, string& uri, string& auth_token) {
+  int get_req_info(string &dest, string& uri, string& auth_token) {
     return (op->get_req_info(dest, uri, auth_token));
   }
 

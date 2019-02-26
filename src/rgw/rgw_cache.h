@@ -103,6 +103,7 @@ private:
   long long free_data_cache_size;
   long long outstanding_write_size;
   L2CacheThreadPool *tp;
+  L2CacheThreadPool *tp_pf;
   struct ChunkDataInfo *head;
   struct ChunkDataInfo *tail;
 
@@ -132,6 +133,11 @@ public:
     head = NULL;
     tail = NULL;
   }
+
+  /*** AMIN CODE START ***/
+  void issue_prefetch(get_obj_data *d, off_t ofs, unsigned int len);
+  /*** AMIN CODE START ***/
+
 
   void lru_insert_head(struct ChunkDataInfo *o) {
     o->lru_next = head;
@@ -813,6 +819,17 @@ public:
     return 0;
   }
 
+  /*** AMIN CODE START ***/
+  int iterate_obj(RGWObjectCtx& obj_ctx,
+                          const RGWBucketInfo& bucket_info, const rgw_obj& obj,
+                          off_t ofs, off_t end,
+			  uint64_t max_chunk_size,
+			  int (*iterate_obj_cb)(const RGWBucketInfo&, const rgw_obj& obj,
+                                                const rgw_raw_obj&, off_t, off_t, off_t, bool,
+                                                RGWObjState *, void *),
+	                  void *arg);
+  /*** AMIN CODE END ***/
+
   int flush_read_list(struct get_obj_data *d);
   int get_obj_iterate_cb(RGWObjectCtx *ctx, RGWObjState *astate,
       const RGWBucketInfo& bucket_info, const rgw_obj& obj,
@@ -823,6 +840,96 @@ public:
 };
 
 struct get_obj_data;
+
+/*** AMIN CODE START ***/
+template<typename T>
+int RGWDataCache<T>::iterate_obj(RGWObjectCtx& obj_ctx,
+                          const RGWBucketInfo& bucket_info, const rgw_obj& obj,
+                          off_t ofs, off_t end,
+			  uint64_t max_chunk_size,
+			  int (*iterate_obj_cb)(const RGWBucketInfo&, const rgw_obj& obj,
+                                                const rgw_raw_obj&, off_t, off_t, off_t, bool,
+                                                RGWObjState *, void *),
+	                  void *arg)
+{
+  rgw_raw_obj head_obj;
+  rgw_raw_obj read_obj;
+  uint64_t read_ofs = ofs;
+  uint64_t len;
+  bool reading_from_head = true;
+  RGWObjState *astate = NULL;
+
+  T::obj_to_raw(bucket_info.placement_rule, obj, &head_obj);
+
+  int r = T::get_obj_state(&obj_ctx, bucket_info, obj, &astate, false);
+  if (r < 0) {
+    return r;
+  }
+
+  if (end < 0)
+    len = 0;
+  else
+    len = end - ofs + 1;
+
+  
+  //FIXME: ask MATT: how can we find out if the request is the metadata or data?
+  /*** AMIN CODE START ***/
+
+  //if (((get_obj_data *)arg)->obj_size > (end+1))
+  //  data_cache.issue_prefetch((get_obj_data *)arg, end, ((get_obj_data *)arg)->obj_size - end);
+
+  /*** AMIN CODE END ***/
+
+  if (astate->has_manifest) {
+    /* now get the relevant object stripe */
+    RGWObjManifest::obj_iterator iter = astate->manifest.obj_find(ofs);
+
+    RGWObjManifest::obj_iterator obj_end = astate->manifest.obj_end();
+
+    for (; iter != obj_end && ofs <= end; ++iter) {
+      off_t stripe_ofs = iter.get_stripe_ofs();
+      off_t next_stripe_ofs = stripe_ofs + iter.get_stripe_size();
+
+      while (ofs < next_stripe_ofs && ofs <= end) {
+        read_obj = iter.get_location().get_raw_obj(this);
+        uint64_t read_len = std::min(len, iter.get_stripe_size() - (ofs - stripe_ofs));
+        read_ofs = iter.location_ofs() + (ofs - stripe_ofs);
+
+        if (read_len > max_chunk_size) {
+          read_len = max_chunk_size;
+        }
+
+        reading_from_head = (read_obj == head_obj);
+        r = iterate_obj_cb(bucket_info, obj, read_obj, ofs, read_ofs, read_len, reading_from_head, astate, arg);
+	if (r < 0) {
+	  return r;
+        }
+
+	len -= read_len;
+        ofs += read_len;
+      }
+    }
+  } else {
+    while (ofs <= end) {
+      read_obj = head_obj;
+      uint64_t read_len = std::min(len, max_chunk_size);
+
+      r = iterate_obj_cb(bucket_info, obj, read_obj, ofs, ofs, read_len, reading_from_head, astate, arg);
+      if (r < 0) {
+	return r;
+      }
+
+      len -= read_len;
+      ofs += read_len;
+    }
+  }
+
+  return 0;
+}
+
+/*** AMIN CODE END ***/
+
+
 
 template<typename T>
 int RGWDataCache<T>::flush_read_list(struct get_obj_data *d) {
@@ -840,9 +947,10 @@ int RGWDataCache<T>::flush_read_list(struct get_obj_data *d) {
   list<bufferlist>::iterator iter;
   for (iter = l.begin(); iter != l.end(); ++iter) {
     bufferlist& bl = *iter;
-    oid = d->get_pending_oid();
-    if (bl.length() == 0x400000)
-      data_cache.put(bl, bl.length(), oid);
+    //FIXME: cache disabled
+    //oid = d->get_pending_oid();
+    //if (bl.length() == 0x400000)
+    //  data_cache.put(bl, bl.length(), oid);
     r = d->client_cb->handle_data(bl, 0, bl.length());
     if (r < 0) {
       mydout(0) << "ERROR: flush_read_list(): d->client_cb->handle_data() returned " << r << dendl;
@@ -912,13 +1020,14 @@ int RGWDataCache<T>::get_obj_iterate_cb(RGWObjectCtx *ctx, RGWObjState *astate,
    */
   d->add_io(obj_ofs, len, &pbl, &c);
 
-  mydout(20) << "rados->get_obj_iterate_cb oid=" << read_obj.oid << " obj-ofs=" << obj_ofs << " read_ofs=" << read_ofs << " len=" << len << dendl;
-  op.read(read_ofs, len, pbl, NULL);
+  //mydout(20) << "rados->get_obj_iterate_cb oid=" << read_obj.oid << " obj-ofs=" << obj_ofs << " read_ofs=" << read_ofs << " len=" << len << dendl;
+  //op.read(read_ofs, len, pbl, NULL);
 
   librados::IoCtx io_ctx(d->io_ctx);
   io_ctx.locator_set_key(read_obj.loc);
 
-  if (data_cache.get(oid)) {
+  /*** AMIN CODE ***/
+  if (false){ //(data_cache.get(oid)) {
     librados::L1CacheRequest *cc;
     d->add_l1_request(&cc, pbl, oid, len, obj_ofs, read_ofs, key, c);
     r = io_ctx.cache_aio_notifier(oid, cc);
@@ -926,7 +1035,7 @@ int RGWDataCache<T>::get_obj_iterate_cb(RGWObjectCtx *ctx, RGWObjState *astate,
     if (r != 0 ){
       mydout(0) << "Error cache_aio_read failed err=" << r << dendl;
     }
-  } else if (d->deterministic_hash_is_local(oid)){
+  } else if (true){// (d->deterministic_hash_is_local(oid)){
     mydout(20) << "rados->get_obj_iterate_cb oid=" << oid << " obj-ofs=" << obj_ofs << " read_ofs=" << read_ofs << " len=" << len << dendl;
     op.read(read_ofs, len, pbl, NULL);
     r = io_ctx.aio_operate(oid, c, &op, NULL);
@@ -1015,6 +1124,43 @@ private:
   CephContext *cct;
 };
 
+
+/*** AMIN CODE START ***/
+
+struct PrefetchReq{
+  string auth_token;
+  string uri;
+
+  off_t ofs;
+  off_t len;  
+  
+};
+
+class HttpPrefetchRequest : public Task {
+public:
+  HttpPrefetchRequest(PrefetchReq *_req, CephContext *_cct) : Task(), req(_req), cct(_cct) {
+    pthread_mutex_init(&qmtx,0);
+    pthread_cond_init(&wcond, 0);
+  }
+  ~HttpPrefetchRequest() {
+    pthread_mutex_destroy(&qmtx);
+    pthread_cond_destroy(&wcond);
+  }
+  virtual void run();
+  virtual void set_handler(void *handle) {
+    curl_handle = (CURL *)handle;
+  }
+private:
+  int submit_http_request();
+  //int sign_request(RGWAccessKey& key, RGWEnv& env, req_info& info);
+private:
+  pthread_mutex_t qmtx;
+  pthread_cond_t wcond;
+  PrefetchReq *req;
+  CURL *curl_handle;
+  CephContext *cct;
+};
+/*** AMIN CODE END ***/
 
 
 #endif

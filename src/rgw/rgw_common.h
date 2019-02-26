@@ -1927,7 +1927,7 @@ struct req_state : DoutPrefixProvider {
   CephContext* get_cct() const override { return cct; }
   unsigned get_subsys() const override { return ceph_subsys_rgw; }
 
-  int get_req_info(string dest, string &uri, string &auth_token); 
+  int get_req_info(string &dest, string &uri, string &auth_token); 
   int submit_http_req(string dest, off_t obj_ofs, size_t len, off_t read_ofs, void* args, size_t (*write_cb)(void *, size_t, size_t, void *)); 
 };
 
