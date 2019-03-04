@@ -44,15 +44,15 @@ The Ceph Filesystem (CephFS) provides a POSIX-compliant filesystem as a service 
 As our project mainly deals with the radosgw component. We will explain that in more details here. The Ceph Object Storage daemon, radosgw (RGW), is a FastCGI service that provides a RESTful HTTP API to access the data. It layers on top of the Ceph Storage Cluster with its own data formats and maintains its own user database, authentication, and access control. The RGW uses a unified namespace, which means users can use either the OpenStack Swift-compatible API or the Amazon S3-compatible API. For example, the user can write data using the S3-compatible API with one application and then read data using the Swift-compatible API with another application.
 
 ### Making Ceph Faster
-Due to the spatial locality and temporal locality of data being requested by applications, caching and prefetching are effective methods to improve the performance of a distributed system. Prefetching the data and then caching it on the gateway can dramatically cut down on the latency to access data, thus resulting in an overall better overall throughput and quality of service (QoS).
+Due to the spatial locality and temporal locality of data being requested by applications, caching and prefetching are effective methods to improve the performance of a distributed storage system. Prefetching the data and then caching it on the gateway can dramatically cut down on the latency to access data, thus resulting in an overall better overall throughput and quality of service (QoS).
 
 Unfortunately, Ceph does not support caching data. As a result, a team of students in Mass Open Cloud (MOC) designed and developed a new two-layer caching system in RGW to make Ceph more efficient.
 
 ## Goals of this Project
-The natural step after developing the caching system for Ceph is to develop a prefetching mechanism. Since the majority of data has spatial locality, prefetching next (sequentially located) data can increase the Ceph performance. Following are the goals of our projects,
+The natural step after developing the caching system for Ceph is to develop a prefetching mechanism. Since the majority of data has spatial locality, prefetching next (sequentially located) data can increase the Ceph performance. A team of researcher at Boston University has already developed and integrated a cache with Ceph. For this porject we will be developing a prefteching mechanism. Following are the goals of our projects,
 - Design and develop a prefetching mechanism for Ceph. We will also be integrating the prefetching with previously implemented two-level cache in Ceph.
-- We will also be developing a mechanism to evaluate the performance of Ceph with/without the prefetching system.
-- We are also hoping to develop commands/API to monitor the state of the previously implemented caching system.
+- We will also be developing a metric/workload to evaluate the performance of Ceph with/without the prefetching system.
+- We are also hoping to develop API like set of commands to monitor the state of the caching system.
 The final implementation will be a part of the Ceph project through the upstream process. As a result, the team will follow production level coding as much as possible. In this manner, the coding quality should be acceptable by the open source community.
 
 
