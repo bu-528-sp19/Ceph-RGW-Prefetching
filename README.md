@@ -80,19 +80,21 @@ CEPH provides end-user REST API to store, retrieve and update data. This API use
 To achieve the above, we first need to have a fine understanding of the source code of the RADOS gateway that implements the storage/retrieves data from the storage. 
 
 
-## Acceptance criteria
+## Acceptance criteria / MVP 
+
+MVP: Implimentation of block-level prefetching mechanism in rgw cache. And if time allows we would also impliment API which would let user prefetch data in the cache prior to requesting. 
 
 Adding a prefetching system should increase the overall performance of Ceph storage. Since cache space is limited and valuable, prefetching wrong data can result in wasting cache space and eventually degradation of the caching system. 
 We argue that spatial locality is true for the majority of datasets but not for all of them. Therefore, we should see a higher performance for the majority of applications, however, few applications may have a worse performance with prefetching comparing to having an only caching system. 
 
 ## Release Planning
 To finish the project, we consider the following steps:
-- Get acquaintance with Ceph, its code, and structure. At the end of this step, we should have a good knowledge about Ceph storage system while having a Ceph system deployed.
-- Reading developed caching system code and learn how it does work.
-- Designing the prefetching system based on the Ceph and the developed caching system.
-- Developing the designed prefetching system on top of the developed caching system.
-- Evaluating the implemented prefetching system.
-- Developing a mechanism (including an interface) to report the content of the cache to the system admin and the users.
+- Get acquaintance with Ceph, its code, and structure. At the end of this step, we should have a good knowledge about Ceph storage system while having a Ceph system deployed. (Sprint 1)
+- Reading developed caching system code and learn how it does work. (Sprint 2)
+- Designing the prefetching system based on the Ceph and the developed caching system. (Sprint 3 & 4)
+- Developing the designed prefetching system on top of the developed caching system. (Sprint 3 & 4)
+- Evaluating the implemented prefetching system. (Sprint 5)
+- Developing a mechanism (including an interface) to report the content of the cache to the system admin and the users. (if time allows)
 
 
 
