@@ -89,13 +89,12 @@ We argue that spatial locality is true for the majority of datasets but not for 
 
 ## Release Planning
 To finish the project, we consider the following steps:
-- Get acquaintance with Ceph, its code, and structure. At the end of this step, we should have a good knowledge about Ceph storage system while having a Ceph system deployed. (Sprint 1)
-- Reading developed caching system code and learn how it does work. (Sprint 2)
-- Designing the prefetching system based on the Ceph and the developed caching system. (Sprint 3 & 4)
-- Developing the designed prefetching system on top of the developed caching system. (Sprint 3 & 4)
-- Evaluating the implemented prefetching system. (Sprint 5)
-- Developing a mechanism (including an interface) to report the content of the cache to the system admin and the users. (if time allows)
-
+- Get acquaintance with Ceph, its code, and structure. At the end of this step, we should have a good knowledge about Ceph storage system while having a Ceph system deployed. **(Sprint 1)**
+- Reading developed caching system code and learn how it does work. **(Sprint 2)**
+- Designing the prefetching system based on the Ceph and the developed caching system. **(Sprint 3 & 4)**
+- Developing the designed prefetching system on top of the developed caching system. **(Sprint 3 & 4)**
+- Evaluating the implemented prefetching system. **(Sprint 5)**
+- Developing a mechanism (including an interface) to report the content of the cache to the system admin and the users. **(if time allows)**
 
 
 
