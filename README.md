@@ -80,12 +80,12 @@ CEPH provides end-user REST API to store, retrieve and update data. This API use
 To achieve the above, we first need to have a fine understanding of the source code of the RADOS gateway that implements the storage/retrieves data from the storage. 
 
 
-## Acceptance criteria / MVP 
+## Acceptance Criteria / MVP 
 
 MVP: Implimentation of block-level prefetching mechanism in rgw cache. And if time allows we would also impliment API which would let user prefetch data in the cache prior to requesting. 
 
-Adding a prefetching system should increase the overall performance of Ceph storage. Since cache space is limited and valuable, prefetching wrong data can result in wasting cache space and eventually degradation of the caching system. 
-We argue that spatial locality is true for the majority of datasets but not for all of them. Therefore, we should see a higher performance for the majority of applications, however, few applications may have a worse performance with prefetching comparing to having an only caching system. 
+*MVP: Effect on Performance:* Adding a prefetching system should increase the overall performance of Ceph storage. Since cache space is limited and valuable, prefetching wrong data can result in wasting cache space and eventually degradation of the caching system. We argue that spatial locality is true for the majority of datasets but not for all of them. Therefore, we should see a higher performance for the majority of applications, however, few applications may have a worse performance with prefetching comparing to having an only caching system. 
+
 
 ## Release Planning
 To finish the project, we consider the following steps:
