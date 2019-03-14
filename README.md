@@ -55,16 +55,6 @@ The natural step after developing the caching system for Ceph is to develop a pr
 - We are also hoping to develop API like set of commands to monitor the state of the caching system.
 The final implementation will be a part of the Ceph project through the upstream process. As a result, the team will follow production level coding as much as possible. In this manner, the coding quality should be acceptable by the open source community.
 
-
-## Users/Personas Of The Project
-User - Human - Users that wish to store a file in a distributed storage system.
-
-Developer - Human - A developer that handles the design of the prefetching mechanism and ensures its streamliness with the current caching system.
-
-Prefetching mechanism - Nonhuman - Synchronizes the remaining parts of the accessed file to the cache making available per request.
-
-User interface - Nonhuman - A command-line interface to allow system admins to view the status of the cache.
-
 ## Scope and Features Of The Project
 To develop a prefetching mechanism which intends to improve the current state of reading files from DSS. The goal for this project is to provide a mechanism that will complement the current performance of the cache by retrieving the chunks of the accessed file preceding the request operation for that particular file. These two approaches a cache working standalone or a cache integrated with a prefetching mechanism should be compared and evaluated in terms of performance. In addition, a more interactive interface for system admins should be developed which determines the status of the cache.
 
