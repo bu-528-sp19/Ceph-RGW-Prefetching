@@ -300,7 +300,7 @@ req_state::~req_state() {
 }
 
 int req_state::submit_http_req(string dest, off_t obj_ofs, size_t len, off_t read_ofs, void* args, size_t (*write_cb)(void *, size_t, size_t, void *)){
-  return 0;
+  return obj_size;
 }
 
 int req_state::get_req_info(string dest, string &uri, string &auth_token){
