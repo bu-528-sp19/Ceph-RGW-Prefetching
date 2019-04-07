@@ -1,4 +1,4 @@
-﻿Introduction, Vision, and Goals Of The Project
+## Introduction, Vision, and Goals Of The Project
 
 
 The amount of produced data every day is around 2.5 exabyte of data. This data is generated through the Internet, Social Media, Communication, Digital Photos, IoT and etc. The pace of generating data is only accelerating with the growth of using various digital services. Over the last two years alone 90 percent of the data in the world was generated.
@@ -13,7 +13,7 @@ The pace of generating data not only needs faster drives and networks, but it al
 A distributed storage system can relate to any of the 3 types of storage: block, file, and object. In the case of block-level storage systems “distributed data storage” typically relates to one storage system in a tight geographical area, usually located in one data center, since performance demands are very high. In the case of object-storage systems – they can be both in one location or more locations and here geographically a distributed storage system could work, as the requirements on performance are not as high as for block-level storage. File storage falls in between, depending on the workload the user of the system is running.
 
 
-How does a distributed storage system alleviate the current problems?
+## How does a distributed storage system alleviate the current problems?
 
 
 1- Flexibility and scalability
@@ -46,7 +46,7 @@ Due to the spatial locality and temporal locality of data, caching and prefetchi
 Unfortunately, Ceph does not support caching data. As a result, a team of students in Mass Open Cloud (MOC) designed and developed a new two-layer caching system to make Ceph more efficient. This system deploys caching system in RGW machine improving overall Ceph performance.
 
 
-Goals of this Project
+## Goals of this Project
 The natural step after developing the caching system for Ceph is to develop prefetching mechanism. Since the majority of data has spatial locality, prefetching next (sequentially located) data can increase the Ceph performance. In this project, we will develop:
 1. A simple prefetching system for Ceph. This system will figure out which file is accessed and will prefetch the remaining parts of the file before actual request. By the time of receiving the request for the remaining parts, the data is ready and therefore the user wait time will be reduced. This system will be a part of upstream Ceph code.
 2. A mechanism to evaluate the overall performance of Ceph while the prefetching system is in place. We will design and deploy a scenario to find out how good the new prefetching system is.
@@ -54,26 +54,6 @@ The natural step after developing the caching system for Ceph is to develop pref
 
 
 The final implementation will be a part of Ceph project through upstream process. As a result, the team will follow production level coding as much as possible. In this manner, the coding quality should be acceptable by the open source community.
-
-
-
-
-
-
-
-
-
-
-________________
-
-
-
-
-
-
-
-
-
 
 Users/Personas Of The Project
 User
@@ -99,7 +79,7 @@ Scope and Features Of The Project
 To develop a prefetching mechanism which intends to improve the current state of reading files from DSS. The goal for this project is to provide a mechanism that will complement the current performance of the cache by retrieving the chunks of the accessed file preceding the request operation for that particular file. These two approaches a cache working standalone or a cache integrated with a prefetching mechanism should be compared and evaluated in terms of performance. In addition, a useful interface for system admins should be developed which determines the status of the cache.
 
 
-Solution Concept
+## Solution Concept
 
 
 CEPH provides end-user REST API to store, retrieve and update data. This API used RADOS gateway to interact with the storage clusters. And after discussing with mentors we realized that this would be the best place to implement prefetching. We are planning to implement prefetching in the following way; 
@@ -115,20 +95,14 @@ To achieve the above, we first need to have a fine understanding of the source c
 
 
 
-
-
-
-________________
-
-
-Acceptance criteria
+## Acceptance criteria
 
 
 Adding a prefetching system should increase the overall performance of Ceph storage. Since cache space is limited and valuable, prefetching wrong data can result in wasting cache space and eventually degradation of the caching system. 
 We argue that spatial locality is true for the majority of datasets but not for all of them. Therefore, we should see a higher performance for the majority of applications, however, few applications may have a worse performance with prefetching comparing to having an only caching system. 
 
 
-Release Planning
+## Release Planning
 To finish the project, we consider the following steps:
 1. Get acquaintance with Ceph, its code, and structure. At the end of this step, we should have a good knowledge about Ceph storage system while having a Ceph system deployed.
 2. Reading developed caching system code and learn how it does work.
@@ -137,8 +111,3 @@ To finish the project, we consider the following steps:
 5. Evaluating the implemented prefetching system.
 6. Developing a mechanism (including an interface) to report the content of the cache to the system admin and the users.
 
-
-
-
-[a]maybe it is better to say users/applications
-[b]How about like this?
