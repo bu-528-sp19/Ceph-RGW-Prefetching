@@ -1,6 +1,0 @@
-tasks:
-- install:
-    branch: luminous
-- install.upgrade:
-    mon.a:
-    mon.b:

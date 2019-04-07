@@ -1,3 +1,0 @@
-lib/systemd/system/ceph-mgr*
-usr/bin/ceph-mgr
-usr/lib/ceph/mgr
