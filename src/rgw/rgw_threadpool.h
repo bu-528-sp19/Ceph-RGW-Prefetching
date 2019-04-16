@@ -14,11 +14,13 @@ public:
   virtual ~WorkerThread()
   {
     assert(state != EState_Started || joined);
+    curl_easy_cleanup(curl);
   }
 
   void start()
   {
     assert(state == EState_None);
+    curl= curl_easy_init();
     if (pthread_create(&handle, NULL, threadProc, this))
       abort();
     state = EState_Started;

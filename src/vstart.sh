@@ -531,7 +531,7 @@ $extra_conf
         rgw crypt require ssl = false
         rgw lc debug interval = 10
         rgw_datacache_persistent_path="/tmp/"
-        rgw_datacache_size=104857600
+        rgw_datacache_size=5000000000
 
 
 [mds]

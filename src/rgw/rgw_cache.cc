@@ -814,7 +814,7 @@ static size_t _prefetch_response_cb(void *ptr, size_t size, size_t nmemb, void* 
 int HttpPrefetchRequest::submit_http_request () {
 
   CURLcode res;
-  string range = std::to_string(req->ofs)+ "-"+ std::to_string(req->len);
+  string range = std::to_string(req->ofs)+ "-"+ std::to_string(req->len + req->len);
   struct curl_slist *header = NULL;
 
   /* FIXME: ASK MATT: hot to sign a S3 request with authentication */
