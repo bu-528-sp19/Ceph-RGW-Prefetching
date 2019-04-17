@@ -1736,7 +1736,7 @@ int RGWGetObj::get_data_cb(bufferlist& bl, off_t bl_ofs, off_t bl_len)
     gc_invalidate_time = start_time;
     gc_invalidate_time += (s->cct->_conf->rgw_gc_obj_min_wait / 2);
   }
-
+  /*if this request came with prefetch header do not send the data back*/
   if (s->info.env->get("HTTP_PREFETCH"))
       return 0; 
   else
@@ -1946,7 +1946,11 @@ void RGWGetObj::execute()
   end_x = end;
   filter->fixup_range(ofs_x, end_x);
 
-
+  /*if there was prefetch header in the request 
+   just send the header backs with content-length as zero 
+   after that restore the length and read the data 
+   and place in the cache
+  */
   if (s->info.env->get("HTTP_PREFETCH")){
 	total_len = 0;
 	send_response_data(bl, 0, 0);
