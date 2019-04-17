@@ -238,7 +238,7 @@ protected:
   uint64_t mod_pg_ver;
   off_t ofs;
   uint64_t total_len;
-  uint64_t total_read_prefetch;
+//  uint64_t total_read_prefetch;
   off_t start;
   off_t end;
   ceph::real_time mod_time;
@@ -282,7 +282,7 @@ public:
     start = 0;
     ofs = 0;
     total_len = 0;
-    total_read_prefetch = 0;
+  //  total_read_prefetch = 0;
     end = -1;
     mod_ptr = NULL;
     unmod_ptr = NULL;

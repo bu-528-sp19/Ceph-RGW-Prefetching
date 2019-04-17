@@ -130,7 +130,7 @@ public:
   void init(CephContext *_cct) {
     cct = _cct;
     
-    free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 104857600 : cct->_conf->rgw_datacache_size;
+    free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 419430400 : cct->_conf->rgw_datacache_size;
     head = NULL;
     tail = NULL;
   }

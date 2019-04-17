@@ -236,8 +236,6 @@ size_t RGWCivetWeb::complete_header()
 
 size_t RGWCivetWeb::send_content_length(uint64_t len)
 {
-  if (env.get("HTTP_PREFETCH"))
-	len = 5;
   static constexpr size_t CONLEN_BUF_SIZE = 128;
   char sizebuf[CONLEN_BUF_SIZE];
   const auto sizelen = snprintf(sizebuf, sizeof(sizebuf),
