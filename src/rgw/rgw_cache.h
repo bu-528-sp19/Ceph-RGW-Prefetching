@@ -873,13 +873,6 @@ int RGWDataCache<T>::iterate_obj(RGWObjectCtx& obj_ctx,
     len = end - ofs + 1;
 
   
-  //FIXME: ask MATT: how can we find out if the request is the metadata or data?
-  /*** AMIN CODE START ***/
-
-  if (((get_obj_data *)arg)->obj_size > (end+1))
-    data_cache.issue_prefetch((get_obj_data *)arg, end, ((get_obj_data *)arg)->obj_size - end);
-
-  /*** AMIN CODE END ***/
 
   if (astate->has_manifest) {
     /* now get the relevant object stripe */
@@ -924,6 +917,15 @@ int RGWDataCache<T>::iterate_obj(RGWObjectCtx& obj_ctx,
       ofs += read_len;
     }
   }
+
+  /*** AMIN CODE START ***/
+
+  if (((get_obj_data *)arg)->obj_size > (end+1))
+    data_cache.issue_prefetch((get_obj_data *)arg, end, ((get_obj_data *)arg)->obj_size - end);
+
+  /*** AMIN CODE END ***/
+
+
 
   return 0;
 }
