@@ -1,19 +1,13 @@
 ## Introduction, Vision, and Goals Of The Project
 
 
-The amount of produced data every day is around 2.5 exabyte of data. This data is generated through the Internet, Social Media, Communication, Digital Photos, IoT and etc. The pace of generating data is only accelerating with the growth of using various digital services. Over the last two years alone 90 percent of the data in the world was generated.
+Around 2.5 exabyte of data is being generated everyday. This data is generated through the Internet, Social Media, Communication, Digital Photos, IoT and etc. 
 
+Storing data has evolved during the years in order to accommodate the rising needs of applications using this data. The traditional approach to storage – a standalone, specialized storage system – no longer works, for both technical and economic reasons. 
 
-Storing data has evolved during the years in order to accommodate the rising needs of companies and individuals. The traditional approach to storage – a standalone, specialized storage system – no longer works, for both technical and economic reasons. 
+Distributed Storage System (DSS) is an efficient and economic way of managing data. In distributed storage systems, data is stored on multiple commodity/commercial servers. 
 
-
-The pace of generating data not only needs faster drives and networks, but it also needs a new approach to store data. Distributed Storage System (DSS) is a storing method which solves most of the present problems. We can define distributed data storage as “Storing data on a multitude of standard servers, which behave as one storage system although data is distributed between these servers.”
-
-
-A distributed storage system can relate to any of the 3 types of storage: block, file, and object. In the case of block-level storage systems “distributed data storage” typically relates to one storage system in a tight geographical area, usually located in one data center, since performance demands are very high. In the case of object-storage systems – they can be both in one location or more locations and here geographically a distributed storage system could work, as the requirements on performance are not as high as for block-level storage. File storage falls in between, depending on the workload the user of the system is running.
-
-
-## How does a distributed storage system alleviate the current problems?
+## How does a distributed storage system (DSS) alleviate the current problems?
 
 
 1- Flexibility and scalability
@@ -25,29 +19,33 @@ In a distributed storage system, any node can read and write in parallel increas
 
 
 3- Cost
- DSS uses standard servers, drives, and network, which are less expensive. In addition, DSS is simpler to manage, which means less staff would be required to run the IT infrastructure.
+DSS uses standard servers, drives, and network, which are less expensive. In addition, DSS is simpler to manage, which means less staff would be required to run the IT infrastructure.
 
 
-Ceph
-One of the distributed storage systems is Ceph. it is an open source storage platform, implements object storage on a single distributed computer cluster, and provides interfaces for object-, block- and file-level storage. Ceph aims primarily for completely distributed operation without a single point of failure, scalable to the exabyte level, and freely available.
+## Ceph
+One of the distributed storage systems is Ceph. it is an open source storage platform, which implements object storage on a single distributed computer cluster, and provides interfaces for object-, block- and file-level storage. Ceph aims primarily for completely distributed operation without a single point of failure, scalable to the exabyte level, and freely available.
 
 
 Ceph replicates data and makes it fault-tolerant, using commodity hardware and requiring no specific hardware support. As a result of its design, the system is both self-healing and self-managing, aiming to minimize administration time and other costs.
 
 
-Ceph Object Storage
-The Ceph Object Storage daemon, radosgw (RGW), is a HTTP service that provides a RESTful HTTP API to access the data. It layers on top of the Ceph Storage Cluster with its own data formats, and maintains its own user database, authentication, and access control. The RGW uses a unified namespace, which means users can use either the OpenStack Swift-compatible API or the Amazon S3-compatible API. For example, the user can write data using the S3-compatible API with one application and then read data using the Swift-compatible API with another application.
+### How does CEPH works
+CEPH exposes an interface to the client through a gateway called radosgw (RGW). It layers on top of the Ceph Storage Cluster with its own data formats, and maintains its own user database, authentication, and access control. The RGW uses a unified namespace, which means users can use either the OpenStack Swift-compatible API or the Amazon S3-compatible API. For example, the user can write data using the S3-compatible API with one application and then read data using the Swift-compatible API with another application.
 
 
-Making Ceph faster
+#### Making Ceph faster
 Due to the spatial locality and temporal locality of data, caching and prefetching are effective methods to improve the I/O performance. Prefetching the data and then caching them on the clients can effectively reduce the number of data requests and dramatically cutting down on the latency to access data, thus resulting in an overall better quality of service (QoS).
 
-
-Unfortunately, Ceph does not support caching data. As a result, a team of students in Mass Open Cloud (MOC) designed and developed a new two-layer caching system to make Ceph more efficient. This system deploys caching system in RGW machine improving overall Ceph performance.
+Unfortunately, Ceph does not support caching data. As a result, a team of students in Mass Open Cloud (MOC) designed and developed a new two-layer caching system to make Ceph more efficient. 
 
 
 ## Goals of this Project
-The natural step after developing the caching system for Ceph is to develop prefetching mechanism. Since the majority of data has spatial locality, prefetching next (sequentially located) data can increase the Ceph performance. In this project, we will develop:
+Current caching scheme of CEPH is re-active and data is brought into the cache only when a user sends a request for the particular data. Our goal is to make CEPH-RGW cache more pro-active. We are aiming to impliment an interface where depending on the current access pattern RGW can prefetch more data into the cache so future requests can be served from the cache. In this project we are aimed to impliment two types of prefetching
+
+1. User - directed prefetching 
+2. Automatic prefetching in RGW
+
+
 1. A simple prefetching system for Ceph. This system will figure out which file is accessed and will prefetch the remaining parts of the file before actual request. By the time of receiving the request for the remaining parts, the data is ready and therefore the user wait time will be reduced. This system will be a part of upstream Ceph code.
 2. A mechanism to evaluate the overall performance of Ceph while the prefetching system is in place. We will design and deploy a scenario to find out how good the new prefetching system is.
 3. A system to check the content of cache. It would be very helpful for system administrator and users (if they had the access right) to check the content of cache and analyze the access pattern. This part of project can help to design a more intelligent caching and prefetching systems.
