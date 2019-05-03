@@ -38,48 +38,24 @@ CEPH exposes an interface to the client through a gateway called radosgw (RGW). 
 <p align="center">
   <img src="presentations/ceph.png" width="350" height="400" title="hover text">
 </p>
+
 #### Making Ceph faster
 Due to the spatial locality and temporal locality of data, caching and prefetching are effective methods to improve the I/O performance. Prefetching the data and then caching them on the clients can effectively reduce the number of data requests and dramatically cutting down on the latency to access data, thus resulting in an overall better quality of service (QoS).
 
 Unfortunately, Ceph does not support caching data. As a result, a team of students in Mass Open Cloud (MOC) designed and developed a new two-layer caching system to make Ceph more efficient. 
 
 
-## Goals of this Project
-Current caching scheme of CEPH is re-active and data is brought into the cache only when a user sends a request for the particular data. Our goal is to make CEPH-RGW cache more pro-active. We are aiming to impliment an interface where depending on the current access pattern RGW can prefetch more data into the cache so future requests can be served from the cache. In this project we are aimed to impliment two types of prefetching
+## Goal of this Project (Prefetching)
+Current caching scheme of CEPH is re-active and data is brought into the cache only when a user sends a request for the particular data. Our goal is to make CEPH-RGW cache more pro-active. We are aiming to impliment an interface where depending on the current access pattern RGW can prefetch more data into the cache so future requests can be served from the cache. In this project we are aiming to impliment two types of prefetching
 
-1. User - directed prefetching 
-2. Automatic prefetching in RGW
-
-
-1. A simple prefetching system for Ceph. This system will figure out which file is accessed and will prefetch the remaining parts of the file before actual request. By the time of receiving the request for the remaining parts, the data is ready and therefore the user wait time will be reduced. This system will be a part of upstream Ceph code.
-2. A mechanism to evaluate the overall performance of Ceph while the prefetching system is in place. We will design and deploy a scenario to find out how good the new prefetching system is.
-3. A system to check the content of cache. It would be very helpful for system administrator and users (if they had the access right) to check the content of cache and analyze the access pattern. This part of project can help to design a more intelligent caching and prefetching systems.
-
-
-The final implementation will be a part of Ceph project through upstream process. As a result, the team will follow production level coding as much as possible. In this manner, the coding quality should be acceptable by the open source community.
-
-Users/Personas Of The Project
-User
-	Human
-	Users that wish to store a file in a distributed storage system[a][b].
-	Developer
-	Human
-	A developer that handles the design of the prefetching mechanism and ensures its streamliness with the current caching system.
-	Prefetching mechanism
-	Nonhuman
-	Synchronizes the remaining parts of the accessed file to the cache making available per request.
-	User interface
-	Nonhuman
-	A graphical interface to allow system admins to view the status of the cache.
-	
+1. User - directed prefetching: A user explicitly tell rgw to bring some "data" into the cache.
+2. Automatic prefetching in RGW: RGW prefetches the data into the cache on it's own.
+* If the time allows, we will also impliment a cache monitoring tool.
 
 
 
-________________
-
-
-Scope and Features Of The Project
-To develop a prefetching mechanism which intends to improve the current state of reading files from DSS. The goal for this project is to provide a mechanism that will complement the current performance of the cache by retrieving the chunks of the accessed file preceding the request operation for that particular file. These two approaches a cache working standalone or a cache integrated with a prefetching mechanism should be compared and evaluated in terms of performance. In addition, a useful interface for system admins should be developed which determines the status of the cache.
+## Scope and Features Of The Project
+To develop a prefetching mechanism which intends to improve the current state of reading data from CEPH. The goal for this project is to provide a mechanism that will complement the current performance of the cache by retrieving the chunks of the accessed file preceding the request for that particular file from the user. These two approaches a cache working standalone or a cache integrated with a prefetching mechanism should be compared and evaluated in terms of performance. In addition, a useful interface for system admins should be developed which determines the status of the cache.
 
 
 ## Solution Concept
@@ -99,18 +75,14 @@ To achieve the above, we first need to have a fine understanding of the source c
 
 
 ## Acceptance criteria
-
-
-Adding a prefetching system should increase the overall performance of Ceph storage. Since cache space is limited and valuable, prefetching wrong data can result in wasting cache space and eventually degradation of the caching system. 
-We argue that spatial locality is true for the majority of datasets but not for all of them. Therefore, we should see a higher performance for the majority of applications, however, few applications may have a worse performance with prefetching comparing to having an only caching system. 
-
+An RGW cache coupled with prefetching scheme should improve the overall system throughput as compared to standard CEPH with cache. Moreover user-directed prefetching should reduce the serve time of an object, if it was already brought into the cache.
 
 ## Release Planning
-To finish the project, we consider the following steps:
-1. Get acquaintance with Ceph, its code, and structure. At the end of this step, we should have a good knowledge about Ceph storage system while having a Ceph system deployed.
-2. Reading developed caching system code and learn how it does work.
-3. Designing the prefetching system based on the Ceph and the developed caching system.
-4. Developing the designed prefetching system on top of the developed caching system.
-5. Evaluating the implemented prefetching system.
-6. Developing a mechanism (including an interface) to report the content of the cache to the system admin and the users.
+Out project timeline is as follows: 
+1. Get acquaintance with Ceph, its code, and structure. At the end of this step, we should have a good knowledge about Ceph storage system while having a Ceph system deployed. (Sprint 1)
+2. Reading developed caching system code and learn how it does work. (Sprint 2)
+3. Designing the prefetching system based on the Ceph and the developed caching system. (Sprint 3)
+4. Developing the designed prefetching system on top of the developed caching system. (Srpint 4)
+5. Evaluating the implemented prefetching system. (Sprint 5)
+6. Developing a mechanism (including an interface) to report the content of the cache to the system admin and the users (Stretch Goal 5)
 
