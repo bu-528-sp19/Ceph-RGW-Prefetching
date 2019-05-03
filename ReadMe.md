@@ -30,9 +30,14 @@ Ceph replicates data and makes it fault-tolerant, using commodity hardware and r
 
 
 ### How does CEPH works
+
 CEPH exposes an interface to the client through a gateway called radosgw (RGW). It layers on top of the Ceph Storage Cluster with its own data formats, and maintains its own user database, authentication, and access control. The RGW uses a unified namespace, which means users can use either the OpenStack Swift-compatible API or the Amazon S3-compatible API. For example, the user can write data using the S3-compatible API with one application and then read data using the Swift-compatible API with another application.
 
 
+
+<p align="center">
+  <img src="presentations/ceph.png" width="350" height="400" title="hover text">
+</p>
 #### Making Ceph faster
 Due to the spatial locality and temporal locality of data, caching and prefetching are effective methods to improve the I/O performance. Prefetching the data and then caching them on the clients can effectively reduce the number of data requests and dramatically cutting down on the latency to access data, thus resulting in an overall better quality of service (QoS).
 
