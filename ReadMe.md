@@ -84,5 +84,5 @@ Out project timeline is as follows:
 3. Designing the prefetching system based on the Ceph and the developed caching system. (Sprint 3)
 4. Developing the designed prefetching system on top of the developed caching system. (Srpint 4)
 5. Evaluating the implemented prefetching system. (Sprint 5)
-6. Developing a mechanism (including an interface) to report the content of the cache to the system admin and the users (Stretch Goal 5)
+6. Developing a mechanism (including an interface) to report the content of the cache to the system admin and the users (Stretch Goal)
 
