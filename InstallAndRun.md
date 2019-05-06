@@ -34,6 +34,8 @@ vstart.sh:
 To start a local ceph cluster for development purposes, the RGW Ceph developers use ceph/src/vstart.sh. The variables at the beginning of the command specify how many of each ceph daemon to bring up.
 
     MON=1 OSD=3 RGW=1 MGR=0 MDS=0 ../src/vstart.sh -n -d
+    
+It will start a Ceph Cluster with 5GB cache and it will use ``/tmp`` as cache.
 
 There is a stop.sh script that stops the vstart cluster by killing all the ceph processes. The logs in the out directory can take up a lot of space and should be removed after a stop.sh as well.
 
