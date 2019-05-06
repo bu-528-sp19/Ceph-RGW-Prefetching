@@ -41,10 +41,13 @@ There is a stop.sh script that stops the vstart cluster by killing all the ceph 
 
     $ rm out/*
 ``boto_request.py`` can be used to put/get/prefetch a file from Ceph.
+
 To put a file in the Ceph
 ``python3 boto_request.py put FILE_NAME``
+
 To get a file in the Ceph
 ``python3 boto_request.py get FILE_NAME``
+
 To prefetch a file in the cache in Ceph
 ``python3 boto_request.py prefetch FILE_NAME``
 
