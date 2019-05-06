@@ -1736,7 +1736,10 @@ int RGWGetObj::get_data_cb(bufferlist& bl, off_t bl_ofs, off_t bl_len)
     gc_invalidate_time = start_time;
     gc_invalidate_time += (s->cct->_conf->rgw_gc_obj_min_wait / 2);
   }
-  return send_response_data(bl, bl_ofs, bl_len);
+  if (s->info.env->get("HTTP_PREFETCH"))
+       return 0; 
+  else
+  	return send_response_data(bl, bl_ofs, bl_len);
 }
 
 bool RGWGetObj::prefetch_data()
@@ -1940,6 +1943,13 @@ void RGWGetObj::execute()
   ofs_x = ofs;
   end_x = end;
   filter->fixup_range(ofs_x, end_x);
+
+  if (s->info.env->get("HTTP_PREFETCH")){
+	total_len = 0;
+	send_response_data(bl, 0, 0);
+  	total_len = (ofs <= end ? end + 1 - ofs : 0);
+  }
+
   op_ret = read_op.iterate(ofs_x, end_x, filter);
 
   if (op_ret >= 0)
