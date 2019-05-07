@@ -11,7 +11,7 @@ Prerequisites:
 
 Building Ceph:
 
-    git clone git@github.com:bu-528-sp19/Ceph-RGW-Prefetching.git ; cd ceph
+    git clone git@github.com:bu-528-sp19/Ceph-RGW-Prefetching.git ; cd Ceph-RGW-Prefetching/code/ceph
 
 Install all the dependencies to build Ceph from source.
 
