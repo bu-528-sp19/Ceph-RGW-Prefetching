@@ -30,6 +30,3 @@ We stored 5 files of each 500MB in Ceph and then created 10 requests for each fi
   <img src="presentations/throughput.png" width="400" height="300" title="hover text">
 </p>
 
-
-
-# Discussion
