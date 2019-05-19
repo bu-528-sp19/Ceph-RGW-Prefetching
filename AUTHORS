@@ -1,17 +1,12 @@
-Maintainer
-----------
-Sage Weil <sage@redhat.com>
-
-Component Technical Leads
--------------------------
-For a full list of CTLs and maintainers visit: http://ceph.com/team/
+Original Authors
+----------------
+ywang19@github
+qzheng7
 
 Contributors
 ------------
-For a complete contributor list:
-
-  git shortlog -sn
-
-For more friendly contributor stats, see:
-
-  http://metrics.ceph.com
+niklas974@github
+giteshnandre@github
+jialinsun@github
+cvedel@github
+jburwell@github

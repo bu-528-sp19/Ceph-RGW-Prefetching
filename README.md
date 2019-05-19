@@ -1,207 +1,149 @@
-# Ceph - a scalable distributed storage system
+COSBench - Cloud Object Storage Benchmark
+=========================================
+
+COSBench is a benchmarking tool to measure the performance of Cloud Object Storage services. Object storage is an 
+emerging technology that is different from traditional file systems (e.g., NFS) or block device systems (e.g., iSCSI).
+Amazon S3 and Openstack* swift are well-known object storage solutions.
+
+COSBench now supports OpenStack* Swift and Amplidata v2.3, 2.5 and 3.1, as well as custom adaptors.
+
+Why Modify COSBench? (COSBench + Range Request & Prefetch)
+--------------------
+As part of our [project](https://github.com/bu-528-sp19/Ceph-RGW-Prefetching) we implemented a simple prefetching system for [Ceph](https://github.com/ceph). We use COSBench to evaluate the performance of Ceph with and without the prefetching system. The prefetching is triggered when there is a prefetch header introduced on GET request for an object on or when there is range request in bytes for an object in S3. COSBench does not support range request or sending customized headers on S3. So, we modified COSBench to meet our needs.
+
+How to Invoke Range Request?
+----------------------------
+Populate the *config* attribute of the *storage* element with *is_range_request*, *file_length* and *chunk_length*. Here is an example for a workstage:
+~~~~
+<workstage>
+    <work>
+        <storage type="s3" config="is_range_request=true;file_length=<file_length>;chunk_length=<chunk_length>;path_style_access=true" />
+        <operation type="read" />
+    </work>
+</workstage>
+~~~~
+* **is_range_request=true** makes usual READ operation not to read whole file instead it only reads the chunk of the file
+* **file_length** is long number which indicated the size of the file in bytes
+* **chunk_length** is long number where you indicate how many bytes you want to read from each file in the buckets
+> chunk_length < file_length, so what algorithm does is it will randomly request for chunk_length bytes between 0 and file_length - chunk_length
+
+Please refer to [s3-config-range-sample.xml](https://raw.githubusercontent.com/bissenbay/cosbench/release/conf/s3-config-range-sample.xml) for a complete workload configuration.
+In this example, we are creating 1 bucket, 10 objects of size 15MB. We are running RANGE workload for 5MB.
+
+How to Invoke Prefetch?
+------------------------
+Populate the *config* attribute of the *storage* element with *is_range_request*, *file_length* and *chunk_length*. Here is an example for a workstage:
+~~~~
+<workstage>
+    <work>
+        <storage type="s3" config="is_prefetch=true;path_style_access=true" />
+        <operation type="read" />
+    </work>
+</workstage>
+~~~~
+* **is_prefetch=true** makes usual READ operation not to read file at all. *This is only related to our project, so prefetch would send the user 200 OK status and start copying the object to Rados Gateway*
+
+Please refer to [s3-config-prefetch-sample.xml](https://raw.githubusercontent.com/bissenbay/cosbench/release/conf/s3-config-prefetch-sample.xml) for a complete workload configuration.
+In this example, we are creating 1 bucket, 10 objects of size 4MB. We are running PREFETCH workload for 4MB.
+##### Import Notice
+* Make sure to add the flag *-Dcom.amazonaws.services.s3.disableGetObjectMD5Validation=true* to **cosbench-start.sh**. Otherwise, you will face the following error when trying to add an object to the bucket *com.intel.cosbench.api.storage.StorageException: com.amazonaws.services.s3.model.AmazonS3Exception: null (Service: Amazon S3; Status Code: 403; Error Code: SignatureDoesNotMatch;*
+* Make sure **path_style_access=true** is introduced in the config attribute. This also might lead to erros when working with S3 PUT operations.
+
+
+Installation & Usage
+--------------------
+#### Download
+* Obtain installation package for pre-release v0.4.2.c4 from [github (Releases)](https://github.com/intel-cloud/cosbench/releases) and unzip it under the /home directory on the node.
+    ```
+    wget https://github.com/intel-cloud/cosbench/archive/v0.4.2.c4.zip
+    unzip 0.4.2.c4.zip
+    cd 0.4.2.c4
+    chmod +x *.sh
+    ```
+    ##### Resons why not to use the latest release
+    * The latest release v0.4.2 is broken
+    * If v0.4.2 is used, there will be an error in *controller-boot.log*: "Could not find or load main class org.eclipse.equinox.launcher.Main"
+    * ./start-all.sh will run forever printing ".Ncat: Connection refused." repeatedly which is open issue [#386](https://github.com/intel-cloud/cosbench/issues/386)
+    * The suggested solution at [#240](https://github.com/intel-cloud/cosbench/issues/240) changing TOOL_PARAMS="-i 0" to TOOL_PARAMS="" in *cosbench-start.sh* does not solve the issue
+#### Installation
+* Install dependencies
+    ```
+    sudo yum install -y java-1.8.0-openjdk
+    sudo yum install nc
+    ```
+#### Running on a Single Node 
+* Start COSBench controller and COSBench driver
+    ```
+    ./start-all.sh
+    ```
+* Start COSBench Drivers
+    ```
+    ./start-driver.sh
+    ```
+* Start COSBench Controller
+    ```
+    ./start-controller.sh
+    ```
+
+Please refer to [COSBench installation](https://github.com/ekaynar/Benchmarks/tree/master/cosbench) for additional instructions.
+Please refer to "COSBenchUserGuide.pdf" for details.
+
+* Submitting a workload
+    ```
+    ./cli.sh submit <path_to_xml_file>
+    ```
+* **path_to_xml_file** is the path for the configuration file
+
+Set Up Development Environment
+-----------------------------
+1. Download [Eclipse Installer](https://www.eclipse.org/downloads/)
+2. Install **Eclipse IDE for Enterprise Java Developers**, not Eclipse IDE for Java Developers
+3. Download COSBench as mentioned above and import to Eclipse according to the instructions below
+    ##### Reason
+    * Eclipse IDE for Java does not have Plug-in Development in Preferences
+    
+    ##### Import Notice
+    COSBench is composed of independent projects. So, if you want to make a specific change for some project like in our case (we only modified cosbench-s3 project)
+    1. Make sure that your project can be built and there is no errors
+    2. Select the project and click "Export -> Plug-in Development -> Deployable plugins and fragments"
+    3. Set the "Directory" to "dist\osgi" folder
+    4. At "dist\osgi\plugins" folder, there will be generated a .jar file
+    5. Stop COSBench *./stop-all.sh*
+    6. Copy the generated .jar file to the node where COSBench installed to the directory osgi/plugins and replace it
+    7. Run COSBench *./start-all.sh* to test the changes you made
 
-Please see http://ceph.com/ for current info.
+Please refer to [Setting Up Development Environment](https://github.com/ekaynar/Benchmarks/blob/master/cosbench/BUILD.MD) for additional instructions.
+If a build from source code is needed, please refer to BUILD.md for details.
 
+Licensing
+---------
 
-## Contributing Code
+a) Intel source code is being released under the Apache 2.0 license.
 
-Most of Ceph is licensed under the LGPL version 2.1.  Some
-miscellaneous code is under BSD-style license or is public domain.
-The documentation is licensed under Creative Commons
-Attribution Share Alike 3.0 (CC-BY-SA-3.0).  There are a handful of headers
-included here that are licensed under the GPL.  Please see the file
-COPYING for a full inventory of licenses by file.
+b) Additional libraries used with COSBench have their own licensing; refer to 3rd-party-licenses.pdf for details.
 
-Code contributions must include a valid "Signed-off-by" acknowledging
-the license for the modified or contributed file.  Please see the file
-SubmittingPatches.rst for details on what that means and on how to
-generate and submit patches.
 
-We do not require assignment of copyright to contribute code; code is
-contributed under the terms of the applicable license.
+Distribution Packages
+---------------------
 
+Please refer to "DISTRIBUTIONS.md" to get the link for distribution packages.
 
-## Checking out the source
+Adaptor Development
+-------------------
+If needed, adaptors can be developed for new storage services; please refer to "COSBenchAdaptorDevGuide.pdf" for details.
 
-You can clone from github with
+Resources
+---------
 
-	git clone git@github.com:ceph/ceph
+Wiki: (https://github.com/intel-cloud/cosbench/wiki)
 
-or, if you are not a github user,
+Issue tracking: (https://github.com/intel-cloud/cosbench/issues)
 
-	git clone git://github.com/ceph/ceph
+Mailing list: (http://cosbench.1094679.n5.nabble.com/)
 
-Ceph contains many git submodules that need to be checked out with
 
-	git submodule update --init --recursive
+Other related projects
+----------------------
+COSBench-Workload-Generator: (https://github.com/giteshnandre/COSBench-Workload-Generator)
 
-
-## Build Prerequisites
-
-The list of Debian or RPM packages dependencies can be installed with:
-
-	./install-deps.sh
-
-
-## Building Ceph
-
-Note that these instructions are meant for developers who are
-compiling the code for development and testing.  To build binaries
-suitable for installation we recommend you build deb or rpm packages,
-or refer to the `ceph.spec.in` or `debian/rules` to see which
-configuration options are specified for production builds.
-
-Prerequisite: CMake 3.5.1
-
-Build instructions:
-
-	./do_cmake.sh
-	cd build
-	make
-
-This assumes you make your build dir a subdirectory of the ceph.git
-checkout. If you put it elsewhere, just replace `..` in do_cmake.sh with a
-correct path to the checkout. Any additional CMake args can be specified
-setting ARGS before invoking do_cmake. See [cmake options](#cmake-options) 
-for more details. Eg.
-
-    ARGS="-DCMAKE_C_COMPILER=gcc-7" ./do_cmake.sh
-
-To build only certain targets use:
-
-	make [target name]
-
-To install:
-
-	make install
- 
-### CMake Options
-
-If you run the `cmake` command by hand, there are many options you can
-set with "-D". For example the option to build the RADOS Gateway is
-defaulted to ON. To build without the RADOS Gateway:
-
-	cmake -DWITH_RADOSGW=OFF [path to top level ceph directory]
-
-Another example below is building with debugging and alternate locations 
-for a couple of external dependencies:
-
-	cmake -DLEVELDB_PREFIX="/opt/hyperleveldb" -DOFED_PREFIX="/opt/ofed" \
-	-DCMAKE_INSTALL_PREFIX=/opt/accelio -DCMAKE_C_FLAGS="-O0 -g3 -gdwarf-4" \
-	..
-
-To view an exhaustive list of -D options, you can invoke `cmake` with:
-
-	cmake -LH
-
-If you often pipe `make` to `less` and would like to maintain the
-diagnostic colors for errors and warnings (and if your compiler
-supports it), you can invoke `cmake` with:
-
-	cmake -DDIAGNOSTICS_COLOR=always ..
-
-Then you'll get the diagnostic colors when you execute:
-
-	make | less -R
-
-Other available values for 'DIAGNOSTICS_COLOR' are 'auto' (default) and
-'never'.
-
-
-## Building a source tarball
-
-To build a complete source tarball with everything needed to build from
-source and/or build a (deb or rpm) package, run
-
-	./make-dist
-
-This will create a tarball like ceph-$version.tar.bz2 from git.
-(Ensure that any changes you want to include in your working directory
-are committed to git.)
-
-
-## Running a test cluster
-
-To run a functional test cluster,
-
-	cd build
-	make vstart        # builds just enough to run vstart
-	../src/vstart.sh --debug --new -x --localhost --bluestore
-	./bin/ceph -s
-
-Almost all of the usual commands are available in the bin/ directory.
-For example,
-
-	./bin/rados -p rbd bench 30 write
-	./bin/rbd create foo --size 1000
-
-To shut down the test cluster,
-
-	../src/stop.sh
-
-To start or stop individual daemons, the sysvinit script can be used:
-
-	./bin/init-ceph restart osd.0
-	./bin/init-ceph stop
-
-
-## Running unit tests
-
-To build and run all tests (in parallel using all processors), use `ctest`:
-
-	cd build
-	make
-	ctest -j$(nproc)
-
-(Note: Many targets built from src/test are not run using `ctest`.
-Targets starting with "unittest" are run in `make check` and thus can
-be run with `ctest`. Targets starting with "ceph_test" can not, and should
-be run by hand.)
-
-When failures occur, look in build/Testing/Temporary for logs.
-
-To build and run all tests and their dependencies without other
-unnecessary targets in Ceph:
-
-	cd build
-	make check -j$(nproc)
-
-To run an individual test manually, run `ctest` with -R (regex matching):
-
-	ctest -R [regex matching test name(s)]
-
-(Note: `ctest` does not build the test it's running or the dependencies needed
-to run it)
-
-To run an individual test manually and see all the tests output, run
-`ctest` with the -V (verbose) flag:
-
-	ctest -V -R [regex matching test name(s)]
-
-To run an tests manually and run the jobs in parallel, run `ctest` with 
-the `-j` flag:
-
-	ctest -j [number of jobs]
-
-There are many other flags you can give `ctest` for better control
-over manual test execution. To view these options run:
-
-	man ctest
-
-
-## Building the Documentation
-
-### Prerequisites
-
-The list of package dependencies for building the documentation can be
-found in `doc_deps.deb.txt`:
-
-	sudo apt-get install `cat doc_deps.deb.txt`
-
-### Building the Documentation
-
-To build the documentation, ensure that you are in the top-level
-`/ceph` directory, and execute the build script. For example:
-
-	admin/build-doc
-
+COSBench-Plot: (https://github.com/icclab/cosbench-plot)
