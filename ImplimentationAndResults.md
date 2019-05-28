@@ -1,15 +1,15 @@
 # Implimentaion 
 
 ## User-Directed Prefetching 
-In user directed prefetching we over load the normal GET request with a special prefetch header which is ``prefetch`` for now.
-We check for this header in rgw_op.cc ``RGWGetObj::execute()``. 
-This call ``s->info.env->get("HTTP_PREFETCH")`` returns the value of the HTTP header. 
+In user directed prefetching we overload the normal GET request with a special prefetch header, which is ``prefetch``.
+On receiving a GET request, RGW check for this header in rgw_op.cc ``RGWGetObj::execute()``. 
+To check for the header it calls, ``s->info.env->get("HTTP_PREFETCH")`` and it returns the value of the HTTP header. 
 If the header is present we set the object length to be 0. One thing to notice here is that uptill this point the the response headers are ready and buffered. So we set the ``total_len = 0;`` as this the content legth header in the http response and flush the buffer to the clinet. Calling the function ``send_response_data(bl, 0, 0);`` with last argument as 0 always flush the buffer. After this client will exit as it has seen the content-length header to be 0.
 
 We also update the ``RGWGetObj::get_data_cb(bufferlist& bl, off_t bl_ofs, off_t bl_len)``. In case the request had the prefetch header, we don't send the data back to the client and returns without doing anything. Also data has already been cached before the call to ``RGWGetObj::get_data_cb(bufferlist& bl, off_t bl_ofs, off_t bl_len)`` in ``rgw_cache.h``.
 
 
-## RGW-Authomatic Prefetching
+## RGW-Automatic Prefetching
 
 ### The flow:
 When a read request arrives, we check to see if it asks for a whole object or a ``range`` of it. If it is a range, then we calculate what part of it can be prefetched. Based on this information, we create a new request and submit it to the prefetching thread pool. The new thread executes ``run`` function which sends an ``HTTP request``. 
