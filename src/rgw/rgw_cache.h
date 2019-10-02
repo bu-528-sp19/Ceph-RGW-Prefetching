@@ -130,7 +130,8 @@ public:
   void init(CephContext *_cct) {
     cct = _cct;
     
-    free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 419430400 : cct->_conf->rgw_datacache_size;
+    free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 17179869184 : cct->_conf->rgw_datacache_size;
+    //free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 4294967296 : cct->_conf->rgw_datacache_size;
     head = NULL;
     tail = NULL;
   }
@@ -1038,6 +1039,7 @@ int RGWDataCache<T>::get_obj_iterate_cb(RGWObjectCtx *ctx, RGWObjState *astate,
     if (r != 0 ){
       mydout(0) << "Error cache_aio_read failed err=" << r << dendl;
    }
+    mydout(0) << "hello beauty" << dendl;
   } else { // if  (d->deterministic_hash_is_local(oid)){
     mydout(20) << "rados->get_obj_iterate_cb oid=" << read_obj.oid << " obj-ofs=" << obj_ofs << " read_ofs=" << read_ofs << " len=" << len << dendl;
     op.read(read_ofs, len, pbl, NULL);

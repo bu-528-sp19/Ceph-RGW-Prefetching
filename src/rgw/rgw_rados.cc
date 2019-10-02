@@ -10316,7 +10316,7 @@ int get_obj_data::get_complete_ios(off_t ofs, list<bufferlist>& bl_list) {
   for (; aiter != completion_map.end(); ++aiter) {
     completion = aiter->second;
     if (!completion->is_safe()) {
-      /* reached a request that is not yet complete, stop */
+       /* reached a request that is not yet complete, stop */
         break;
     }
 
@@ -10489,7 +10489,6 @@ void get_obj_data::cache_aio_completion_cb(librados::CacheRequest *c){
   if (status == ECANCELED) {
     cache_unmap_io(c->ofs);
     ldout(cct, 0) << "engage1: cache_aio_request: status = ECANCLE" << dendl;
-    return;
   } else if (status == 0) {
     cache_unmap_io(c->ofs);
     l2_lock.Lock();
@@ -10571,7 +10570,9 @@ void RGWRados::get_obj_aio_completion_cb(completion_t c, void *arg)
 done_unlock:
   d->data_lock.Unlock();
 done:
-  d->put();
+  if (d->is_cancelled())
+  { d->read_list.clear(); 
+  } else { d->put(); } /***** Mania ****/
   return;
 }
 

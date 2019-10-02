@@ -542,9 +542,13 @@ bool DataCache::get(string oid) {
 	eviction_lock.Unlock();
       }
     } else {	
-      cache_map.erase(oid);
-      lru_remove(chdo);
-      exist = false;
+       cache_map.erase(oid);
+       lru_remove(chdo);
+       exist = false;
+       eviction_lock.Lock();
+       free_data_cache_size += chdo->size;
+       eviction_lock.Unlock();
+
     }
   }
   cache_lock.Unlock();

@@ -6300,7 +6300,7 @@ std::vector<Option> get_rgw_options() {
     .set_description(""),
 
     Option("rgw_datacache_size", Option::TYPE_UINT, Option::LEVEL_ADVANCED)
-    .set_default(1048576)
+    .set_default(10737418240)
     .set_description("Datacache size in bytes"),
 
     Option("rgw_datacache_local_enabled", Option::TYPE_BOOL, Option::LEVEL_ADVANCED)
