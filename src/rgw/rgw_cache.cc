@@ -380,6 +380,37 @@ DataCache::DataCache ()
   tp_pf = new L2CacheThreadPool(8);
 }
 
+
+void DataCache::evict_object(string bucket_name, string object_name){
+    ldout(cct, 0) << "INFO: KARIZ evicts " << bucket_name << ":" << object_name << dendl;
+    string location = cct->_conf->rgw_datacache_persistent_path;
+    /*I am just testing file eviction for now but */
+    /*This allows me to implement partial eviction as well */
+    KarizBlockInfo *kariz_info;
+    map<std::pair<string, string>, KarizBlockInfo*>::iterator iter = metadata_map.find(std::make_pair(bucket_name, object_name));   
+    if (iter != metadata_map.end()) {
+       kariz_info = iter->second;
+       set<string>::iterator itr; 
+       for (itr = kariz_info->cached_chunks.begin(); itr != kariz_info->cached_chunks.end(); ++itr) { 
+          string oid = *itr;
+          /* if oid in cache_map evict it*/
+          map<string, ChunkDataInfo*>::iterator iter = cache_map.find(oid);
+          if (iter != cache_map.end()){
+            remove((location + oid).c_str()); /*remove file from location*/
+            struct ChunkDataInfo *chdo = iter->second;
+            cache_map.erase(oid);  
+            lru_remove(chdo);
+            free(chdo);
+            eviction_lock.Lock();
+            free_data_cache_size += chdo->size;
+            eviction_lock.Unlock();
+          }
+       }
+       metadata_map.erase(make_pair(bucket_name, object_name));
+       free(kariz_info);
+    }
+}
+
 int DataCache::io_write(bufferlist& bl ,unsigned int len, std::string oid) {
 
   ChunkDataInfo*  chunk_info = new ChunkDataInfo;
@@ -423,7 +454,8 @@ void _cache_aio_write_completion_cb(sigval_t sigval) {
 void DataCache::cache_aio_write_completion_cb(cacheAioWriteRequest *c){
 
   ChunkDataInfo  *chunk_info = NULL;
-
+  string bucket_name = c->bucket_name;
+  string object_name = c->object_name;
   ldout(cct, 0) << "engage: cache_aio_write_completion_cb oid:" << c->oid <<dendl;
 
   /*update cahce_map entries for new chunk in cache*/
@@ -435,6 +467,25 @@ void DataCache::cache_aio_write_completion_cb(cacheAioWriteRequest *c){
   chunk_info->size = c->cb->aio_nbytes;
   cache_map.insert(pair<string, ChunkDataInfo*>(c->oid, chunk_info));
   cache_lock.Unlock();
+  /*Kariz*/ 
+  /*get bucket_name, object_name from s, and if the pair is not in the metadata_map insert it with oid, if it is already there */
+  /*FIXME need lock*/
+  map<std::pair<string, string>, KarizBlockInfo*>::iterator iter = metadata_map.find(std::make_pair(c->bucket_name, c->object_name)); 
+  if (iter == metadata_map.end()) {
+    string oid = c->oid;
+    string key("_");
+    size_t pos = oid.rfind(key);
+    if (pos!=string::npos){
+          oid.replace(pos, oid.length(),"");
+    }
+    KarizBlockInfo * kariz_info = new KarizBlockInfo;
+    kariz_info->oid = oid;
+    kariz_info->cached_chunks.insert(c->oid);
+    metadata_map.insert(std::make_pair(std::make_pair(c->bucket_name, c->object_name), kariz_info));
+  } else {
+    KarizBlockInfo * kariz_info = iter->second;
+    kariz_info->cached_chunks.insert(c->oid);
+  }
 
   /*update free size*/
   eviction_lock.Lock();
@@ -445,7 +496,7 @@ void DataCache::cache_aio_write_completion_cb(cacheAioWriteRequest *c){
   c->release();
 }
 
-int DataCache::create_aio_write_request(bufferlist& bl, unsigned int len, std::string oid){
+int DataCache::create_aio_write_request(bufferlist& bl, unsigned int len, std::string oid, string bucket_name, string object_id){
 
   struct cacheAioWriteRequest *wr= new struct cacheAioWriteRequest(cct);
   int r=0;
@@ -460,6 +511,9 @@ int DataCache::create_aio_write_request(bufferlist& bl, unsigned int len, std::s
   wr->oid = oid;
   wr->priv_data = this;
 
+  wr->object_name = object_id;
+  wr->bucket_name = bucket_name;
+
   if((r= ::aio_write(wr->cb)) != 0) {
     ldout(cct, 0) << "ERROR: aio_write "<< r << dendl;
     goto error;
@@ -472,7 +526,7 @@ done:
   return r;
 }
 
-void DataCache::put(bufferlist& bl, unsigned int len, std::string oid){
+void DataCache::put(bufferlist& bl, unsigned int len, std::string oid, string bucket_name, string object_name){
 
   int r = 0;
   long long freed_size = 0, _free_data_cache_size = 0, _outstanding_write_size = 0;
@@ -507,7 +561,7 @@ void DataCache::put(bufferlist& bl, unsigned int len, std::string oid){
       return;
     freed_size += r;
   }
-  r = create_aio_write_request(bl, len, oid);
+  r = create_aio_write_request(bl, len, oid, bucket_name, object_name);
   if (r < 0) {
     cache_lock.Lock();
     outstanding_write_list.remove(oid);

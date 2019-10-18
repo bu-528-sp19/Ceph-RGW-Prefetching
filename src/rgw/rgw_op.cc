@@ -1957,6 +1957,11 @@ void RGWGetObj::execute()
   	total_len = (ofs <= end ? end + 1 - ofs : 0);
    }
 
+  if (s->info.env->get("HTTP_KARIZ_PREFETCH")) {
+      string sss = s->info.env->get("HTTP_KARIZ_PREFETCH");
+      ldpp_dout(this, 0) << "HTTP_KARIZ_META, " << sss <<  dendl;     
+  }
+
   op_ret = read_op.iterate(ofs_x, end_x, filter);
 
   if (op_ret >= 0)

@@ -3309,11 +3309,14 @@ public:
                   void *arg);
 
   /*** AMIN CODE END ***/
+  /*KARIZ S*/
+  virtual void evict_object(const string bucket_name, const string object_name) {}
+  /*KARIZ E*/
 
   int append_atomic_test(RGWObjectCtx *rctx, const RGWBucketInfo& bucket_info, const rgw_obj& obj,
 		  librados::ObjectOperation& op, RGWObjState **state);
 
-
+  
   virtual int flush_read_list(struct get_obj_data *d);
 
   virtual int get_obj_iterate_cb(RGWObjectCtx *ctx, RGWObjState *astate,

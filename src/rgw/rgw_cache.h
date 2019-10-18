@@ -7,6 +7,7 @@
 #include "rgw_rados.h"
 #include <string>
 #include <map>
+#include <set> 
 #include <curl/curl.h>
 #include <unordered_map>
 
@@ -22,6 +23,9 @@
 
 #include "include/lru.h" /*engage1*/
 #include "rgw_threadpool.h"
+#include "rgw_common.h"
+#include "rgw_op.h"
+
 
 enum {
   UPDATE_OBJ,
@@ -40,6 +44,12 @@ enum {
 struct DataCache;
 class L2CacheThreadPool;
 class HttpL2Request;
+
+
+struct KarizBlockInfo {
+  string oid;
+  set<string> cached_chunks;
+};
 
 struct ChunkDataInfo : public LRUObject {
 	CephContext *cct;
@@ -68,6 +78,8 @@ struct cacheAioWriteRequest{
 	struct aiocb *cb;
 	DataCache *priv_data;
 	CephContext *cct;
+        string bucket_name;
+        string object_name;
 	
 	cacheAioWriteRequest(CephContext *_cct) : cct(_cct) {}
 	int create_io(bufferlist& bl, unsigned int len, string oid);
@@ -86,6 +98,7 @@ struct DataCache {
 
 private:
   std::map<string, ChunkDataInfo*> cache_map;
+  std::map<std::pair<string, string>, KarizBlockInfo*> metadata_map;
   std::list<string> outstanding_write_list;
   int index;
   RWLock lock;
@@ -114,10 +127,11 @@ public:
   DataCache();
   ~DataCache() {}
 
+  void evict_object(string bucket_name, string object_name);
   bool get(string oid);
-  void put(bufferlist& bl, unsigned int len, string obj_key);
+  void put(bufferlist& bl, unsigned int len, string obj_key, string bucket_name, string object_name);
   int io_write(bufferlist& bl, unsigned int len, std::string oid);
-  int create_aio_write_request(bufferlist& bl, unsigned int len, std::string oid);
+  int create_aio_write_request(bufferlist& bl, unsigned int len, std::string oid, string bucket_name, string object_id);
   void cache_aio_write_completion_cb(cacheAioWriteRequest *c);
   size_t random_eviction();
   size_t lru_eviction();
@@ -286,6 +300,7 @@ struct ObjectCacheEntry {
 };
 
 class ObjectCache {
+public:
   std::unordered_map<string, ObjectCacheEntry> cache_map;
   std::list<string> lru;
   unsigned long lru_size;
@@ -347,6 +362,7 @@ public:
 template <class T>
 class RGWCache  : public T
 {
+public:
   ObjectCache cache;
 
   int list_objects_raw_init(rgw_pool& pool, RGWAccessHandle *handle) {
@@ -394,6 +410,8 @@ public:
 
     return 0;
   }
+
+  virtual void evict_object(const string bucket_name, const string object_name) {}
 
 
   int system_obj_set_attrs(void *ctx, rgw_raw_obj& obj, 
@@ -830,6 +848,7 @@ public:
                                                 const rgw_raw_obj&, off_t, off_t, off_t, bool,
                                                 RGWObjState *, void *),
 	                  void *arg);
+  void evict_object(const string bucket_name, const string object_name);
   /*** AMIN CODE END ***/
 
   int flush_read_list(struct get_obj_data *d);
@@ -945,13 +964,14 @@ int RGWDataCache<T>::flush_read_list(struct get_obj_data *d) {
 
   int r = 0;
 
-  std::string oid;
+  std::string oid, bucket_name, object_name;
   list<bufferlist>::iterator iter;
   for (iter = l.begin(); iter != l.end(); ++iter) {
     bufferlist& bl = *iter;
     oid = d->get_pending_oid();
+    ((RGWGetObj_CB *)(d->client_cb))->get_req_fileinfo(bucket_name, object_name);
     if (bl.length() == 0x400000) {
-      data_cache.put(bl, bl.length(), oid);
+      data_cache.put(bl, bl.length(), oid, bucket_name, object_name);
     }
     r = d->client_cb->handle_data(bl, 0, bl.length());
     if (r < 0) {
@@ -969,6 +989,15 @@ int RGWDataCache<T>::flush_read_list(struct get_obj_data *d) {
   return r;
 
 }
+
+
+template<typename T>
+void RGWDataCache<T>::evict_object(const string bucket_name, const string object_name) {
+    mydout(0) << "KARIZ Evict file" << dendl; 
+    data_cache.evict_object(bucket_name, object_name);
+}
+
+
 
 template<typename T>
 int RGWDataCache<T>::get_obj_iterate_cb(RGWObjectCtx *ctx, RGWObjState *astate,
@@ -1170,6 +1199,10 @@ private:
   CURL *curl_handle;
   CephContext *cct;
 };
+
+
+
+
 /*** AMIN CODE END ***/
 
 

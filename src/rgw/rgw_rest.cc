@@ -1658,6 +1658,9 @@ RGWOp* RGWHandler_REST::get_op(RGWRados* store)
    case OP_DELETE:
      op = op_delete();
      break;
+   case OP_KARIZ_EVICT:
+     op = op_delete();
+     break;
    case OP_HEAD:
      op = op_head();
      break;
@@ -1810,7 +1813,7 @@ static http_op op_from_method(const char *method)
   if (strcmp(method, "PUT") == 0)
     return OP_PUT;
   if (strcmp(method, "DELETE") == 0)
-    return OP_DELETE;
+       return OP_DELETE;
   if (strcmp(method, "HEAD") == 0)
     return OP_HEAD;
   if (strcmp(method, "POST") == 0)
@@ -2218,6 +2221,11 @@ int RGWREST::preprocess(struct req_state *s, rgw::io::BasicClient* cio)
     s->expect_cont = (expect && !strcasecmp(expect, "100-continue"));
   }
   s->op = op_from_method(info.method);
+  
+  if ((s->op == OP_DELETE) && (info.env->get("HTTP_KARIZ_EVICT"))) { /*Kariz KARIZ*/ 
+     s->op = OP_KARIZ_EVICT;
+  }
+
 
   info.init_meta_info(&s->has_bad_meta);
 

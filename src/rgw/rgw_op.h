@@ -323,6 +323,13 @@ public:
   int submit_l2_request(string dest, off_t obj_ofs, size_t len, off_t read_ofs, void* args, size_t (*write_cb)(void *, size_t, size_t, void *)){
     return s->submit_http_req(dest, obj_ofs, len, read_ofs, args, write_cb);
   }
+
+  int get_req_fileinfo(string &bucket_name, string &object_name) {
+    bucket_name = s->init_state.url_bucket;
+    object_name = s->object.name;
+    return 0;   
+  }
+
   int get_req_info(string &dest, string& uri, string& auth_token) {
     return s->get_req_info(dest, uri, auth_token);
   }
@@ -367,6 +374,10 @@ public:
 
   int get_req_info(string &dest, string& uri, string& auth_token) {
     return (op->get_req_info(dest, uri, auth_token));
+  }
+
+  int get_req_fileinfo(string &bucket_name, string &obj_name){
+      return op->get_req_fileinfo(bucket_name, obj_name);
   }
 
   bool get_cache_request() {

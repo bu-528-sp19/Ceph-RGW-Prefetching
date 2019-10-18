@@ -180,6 +180,11 @@ int process_request(RGWRados* const store,
 
   req->op = op;
   dout(10) << "op=" << typeid(*op).name() << dendl;
+  
+  if (s->op == OP_KARIZ_EVICT){
+     store->evict_object(s->init_state.url_bucket, s->object.name);
+     goto done;
+  }
 
   s->op_type = op->get_type();
 
