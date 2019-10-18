@@ -1,0 +1,232 @@
+-- The CXX compiler identification is GNU 7.3.1
+-- The C compiler identification is GNU 7.3.1
+-- The ASM compiler identification is GNU
+-- Found assembler: /opt/rh/devtoolset-7/root/usr/bin/cc
+-- Check for working CXX compiler: /opt/rh/devtoolset-7/root/usr/bin/c++
+-- Check for working CXX compiler: /opt/rh/devtoolset-7/root/usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Check for working C compiler: /opt/rh/devtoolset-7/root/usr/bin/cc
+-- Check for working C compiler: /opt/rh/devtoolset-7/root/usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Looking for pthread_create
+-- Looking for pthread_create - not found
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - found
+-- Found Threads: TRUE  
+-- Looking for fallocate
+-- Looking for fallocate - found
+-- Looking for posix_fadvise
+-- Looking for posix_fadvise - found
+-- Looking for posix_fallocate
+-- Looking for posix_fallocate - found
+-- Looking for syncfs
+-- Looking for syncfs - found
+-- Looking for sync_file_range
+-- Looking for sync_file_range - found
+-- Looking for pwritev
+-- Looking for pwritev - found
+-- Looking for splice
+-- Looking for splice - found
+-- Looking for getgrouplist
+-- Looking for getgrouplist - found
+-- Looking for fdatasync
+-- Looking for fdatasync - found
+-- Looking for strerror_r
+-- Looking for strerror_r - found
+-- Looking for name_to_handle_at
+-- Looking for name_to_handle_at - found
+-- Looking for pipe2
+-- Looking for pipe2 - found
+-- Looking for accept4
+-- Looking for accept4 - found
+-- Looking for pthread_spin_init
+-- Looking for pthread_spin_init - found
+-- Looking for pthread_set_name_np
+-- Looking for pthread_set_name_np - not found
+-- Looking for pthread_get_name_np
+-- Looking for pthread_get_name_np - not found
+-- Looking for pthread_setname_np
+-- Looking for pthread_setname_np - found
+-- Looking for pthread_getname_np
+-- Looking for pthread_getname_np - found
+-- Looking for pthread_rwlockattr_setkind_np
+-- Looking for pthread_rwlockattr_setkind_np - found
+-- Looking for eventfd
+-- Looking for eventfd - found
+-- Looking for getprogname
+-- Looking for getprogname - not found
+-- Looking for include file linux/types.h
+-- Looking for include file linux/types.h - found
+-- Looking for include file linux/version.h
+-- Looking for include file linux/version.h - found
+-- Looking for include file arpa/nameser_compat.h
+-- Looking for include file arpa/nameser_compat.h - found
+-- Looking for include file sys/mount.h
+-- Looking for include file sys/mount.h - found
+-- Looking for include file sys/param.h
+-- Looking for include file sys/param.h - found
+-- Looking for include file sys/types.h
+-- Looking for include file sys/types.h - found
+-- Looking for include file sys/vfs.h
+-- Looking for include file sys/vfs.h - found
+-- Looking for include file sys/prctl.h
+-- Looking for include file sys/prctl.h - found
+-- Looking for include file execinfo.h
+-- Looking for include file execinfo.h - found
+-- Looking for include file sched.h
+-- Looking for include file sched.h - found
+-- Looking for include file valgrind/helgrind.h
+-- Looking for include file valgrind/helgrind.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of __be16
+-- Check size of __be16 - done
+-- Check size of __be32
+-- Check size of __be32 - done
+-- Check size of __be64
+-- Check size of __be64 - done
+-- Check size of __le16
+-- Check size of __le16 - done
+-- Check size of __le32
+-- Check size of __le32 - done
+-- Check size of __le64
+-- Check size of __le64 - done
+-- Check size of __u8
+-- Check size of __u8 - done
+-- Check size of __u16
+-- Check size of __u16 - done
+-- Check size of __u32
+-- Check size of __u32 - done
+-- Check size of __u64
+-- Check size of __u64 - done
+-- Check size of __s8
+-- Check size of __s8 - done
+-- Check size of __s16
+-- Check size of __s16 - done
+-- Check size of __s32
+-- Check size of __s32 - done
+-- Check size of __s64
+-- Check size of __s64 - done
+-- Looking for res_nquery
+-- Looking for res_nquery - found
+-- Looking for F_SETPIPE_SZ
+-- Looking for F_SETPIPE_SZ - found
+-- Looking for __func__
+-- Looking for __func__ - found
+-- Looking for __PRETTY_FUNCTION__
+-- Looking for __PRETTY_FUNCTION__ - found
+-- Looking for getentropy
+-- Looking for getentropy - not found
+-- Performing Test STRERROR_R_CHAR_P
+-- Performing Test STRERROR_R_CHAR_P - Success
+-- Performing Test HAVE_STAT_ST_MTIM_TV_NSEC
+-- Performing Test HAVE_STAT_ST_MTIM_TV_NSEC - Success
+-- Performing Test HAVE_STAT_ST_MTIMESPEC_TV_NSEC
+-- Performing Test HAVE_STAT_ST_MTIMESPEC_TV_NSEC - Failed
+-- Performing Test HAVE_CXX11_ATOMIC
+-- Performing Test HAVE_CXX11_ATOMIC - Success
+-- Found verbs: /usr/lib64/libibverbs.so  
+-- Performing Test HAVE_IBV_EXP
+-- Performing Test HAVE_IBV_EXP - Failed
+-- Found rdmacm: /usr/lib64/librdmacm.so  
+-- Looking for backtrace
+-- Looking for backtrace - found
+-- backtrace facility detected in default set of libraries
+-- Found Backtrace: /usr/include  
+-- Found udev: /usr/lib64/libudev.so  
+-- Found blkid: /usr/lib64/libblkid.so  
+-- Found OpenLdap: /usr/include  
+-- Found fuse: /usr/include/fuse  
+-- Found xfs: /usr/lib64/libhandle.so  
+-- Found cpp_redis: /usr/local/lib/libcpp_redis.a  
+-- Found tacopie: /usr/local/lib/libtacopie.a  
+-- Found aio: /lib64/libaio.so  
+-- Found CUnit: /usr/lib64/libcunit.so  
+-- Found uuid: /usr/lib64/libuuid.so  
+-- Found leveldb: /lib64/libleveldb.so  
+-- Found snappy: /lib64/libsnappy.so  
+-- Found LZ4: /usr/lib64/liblz4.so (found suitable version "1.7.5", minimum required is "1.7") 
+-- Found gperftools: /usr/include (found version "2.6.1") 
+-- Found keyutils: /usr/lib64/libkeyutils.so  
+-- Found CURL: /usr/lib64/libcurl.so (found version "7.29.0")  
+-- Looking for curl_multi_wait
+-- Looking for curl_multi_wait - found
+-- Found PkgConfig: /usr/bin/pkg-config (found version "0.27.1") 
+-- Checking for module 'nss'
+--   Found nss, version 3.44.0
+-- NSS_LIBRARIES: /usr/lib64/libssl3.so;/usr/lib64/libsmime3.so;/usr/lib64/libnss3.so;/usr/lib64/libnssutil3.so
+-- NSS_INCLUDE_DIRS: /usr/include/nss3
+-- Found NSS: /usr/lib64/libssl3.so;/usr/lib64/libsmime3.so;/usr/lib64/libnss3.so;/usr/lib64/libnssutil3.so  
+-- Checking for module 'nspr'
+--   Found nspr, version 4.21.0
+-- Found NSPR: /usr/lib64/libplds4.so;/usr/lib64/libplc4.so;/usr/lib64/libnspr4.so  
+-- Found OpenSSL: /usr/lib64/libcrypto.so (found version "1.0.2k")  
+-- Found EXPAT: /usr/lib64/libexpat.so (found version "2.1.0") 
+-- Found OATH: /usr/lib64/liboath.so  
+ '--prefix=/root/anaconda3' '--host=x86_64-conda_cos6-linux-gnu' '--disable-ldap' '--with-ca-bundle=/root/anaconda3/ssl/cacert.pem' '--with-ssl=/root/anaconda3' '--with-zlib=/root/anaconda3' '--with-gssapi=/root/anaconda3' '--with-libssh2=/root/anaconda3' 'host_alias=x86_64-conda_cos6-linux-gnu' 'CC=/tmp/build/80754af9/curl_split_recipe_1552411662832/_build_env/bin/x86_64-conda_cos6-linux-gnu-cc' 'CFLAGS=-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe -I/root/anaconda3/include -fdebug-prefix-map=/tmp/build/80754af9/curl_split_recipe_1552411662832/work=/usr/local/src/conda/curl_split_recipe-7.64.0 -fdebug-prefix-map=/root/anaconda3=/usr/local/src/conda-prefix' 'LDFLAGS=-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -Wl,-rpath,/root/anaconda3/lib -Wl,-rpath-link,/root/anaconda3/lib -L/root/anaconda3/lib -Wl,-rpath-link,/root/anaconda3/lib' 'CPPFLAGS=-DNDEBUG -D_FORTIFY_SOURCE=2 -O2' 'CPP=/tmp/build/80754af9/curl_split_recipe_1552411662832/_build_env/bin/x86_64-conda_cos6-linux-gnu-cpp'
+-- libcurl is linked with openssl: explicitly setting locks
+-- ssl soname: libssl.so.10
+-- crypto soname: libcrypto.so.10
+-- Found PythonInterp: /usr/bin/python2.7 (found suitable version "2.7.5", minimum required is "2.7") 
+-- Found PythonLibs: /usr/lib64/libpython2.7.so (found suitable version "2.7.5", minimum required is "2.7") 
+-- Found ZLIB: /usr/lib64/libz.so (found version "1.2.7") 
+-- Found LTTngUST: /usr/lib64/liblttng-ust.so;dl (found version "2.4.1") 
+-- Found babeltrace: /usr/include  
+-- BUILDING Boost Libraries at j 1
+-- boost will be downloaded...
+-- Found Boost: /root/ceph_redis/Ceph-RGW-Prefetching/build/boost/include  
+-- Performing Test HAS_FORTIFY_SOURCE
+-- Performing Test HAS_FORTIFY_SOURCE - Success
+-- Performing Test HAS_STACK_PROTECT
+-- Performing Test HAS_STACK_PROTECT - Success
+-- Performing Test HAVE_INTEL_SSE
+-- Performing Test HAVE_INTEL_SSE - Success
+-- Performing Test HAVE_INTEL_SSE2
+-- Performing Test HAVE_INTEL_SSE2 - Success
+-- Performing Test HAVE_INTEL_SSE3
+-- Performing Test HAVE_INTEL_SSE3 - Success
+-- Performing Test HAVE_INTEL_SSSE3
+-- Performing Test HAVE_INTEL_SSSE3 - Success
+-- Performing Test HAVE_INTEL_PCLMUL
+-- Performing Test HAVE_INTEL_PCLMUL - Success
+-- Performing Test HAVE_INTEL_SSE4_1
+-- Performing Test HAVE_INTEL_SSE4_1 - Success
+-- Performing Test HAVE_INTEL_SSE4_2
+-- Performing Test HAVE_INTEL_SSE4_2 - Success
+-- Found Yasm: good -- capable of assembling x86_64
+-- Performing Test HAVE_STDLIB_MAP_SPLICING
+-- Performing Test HAVE_STDLIB_MAP_SPLICING - Failed
+-- Performing Test COMPILER_SUPPORTS_DIAGNOSTICS_COLOR
+-- Performing Test COMPILER_SUPPORTS_DIAGNOSTICS_COLOR - Success
+-- Found PythonInterp: /usr/bin/python2.7 (found suitable version "2.7.5", minimum required is "2") 
+-- Found PythonLibs: /usr/lib64/libpython2.7.so (found suitable version "2.7.5", minimum required is "2") 
+-- Performing Test HAS_VTA
+-- Performing Test HAS_VTA - Success
+-- Found Cython: 0.19  
+-- Performing Test HAS_WARNING_STRINGOP_TRUNCATION
+-- Performing Test HAS_WARNING_STRINGOP_TRUNCATION - Success
+-- Check if the system is big endian
+-- Searching 16 bit integer
+-- Check size of unsigned short
+-- Check size of unsigned short - done
+-- Using unsigned short
+-- Check if the system is big endian - little endian
+-- Found PythonInterp: /usr/bin/python2.7 (found version "2.7.5") 
+-- Found StdFilesystem: stdc++fs  
+-- exclude following files under src: *.js;*.css;civetweb;erasure-code/jerasure/jerasure;erasure-code/jerasure/gf-complete;rocksdb;googletest;spdk;xxHash;isa-l;lua;zstd;crypto/isa-l/isa-l_crypto;blkin;rapidjson;dmclock;seastar;fmt;c-ares
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /root/ceph_redis/Ceph-RGW-Prefetching/build
+done.

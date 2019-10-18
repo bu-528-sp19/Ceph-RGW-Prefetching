@@ -116,6 +116,7 @@ set(librgw_common_srcs
   rgw_rest_sts.cc)
 
 add_library(rgw_common OBJECT ${librgw_common_srcs})
+add_library(cpp_redis OBJECT ${CPP_REDIS_LIBRARIES})
 
 if(WITH_LTTNG)
   # rgw/rgw_op.cc includes "tracing/rgw_op.h"
@@ -230,7 +231,7 @@ target_link_libraries(radosgw-admin rgw_a librados
   cls_log_client cls_timeindex_client
   cls_version_client cls_user_client
   global ${FCGI_LIBRARY} ${LIB_RESOLV}
-  ${CURL_LIBRARIES} ${EXPAT_LIBRARIES} ${BLKID_LIBRARIES})
+  ${CURL_LIBRARIES} ${EXPAT_LIBRARIES} ${BLKID_LIBRARIES} ${CPP_REDIS_LIBRARIES})
 install(TARGETS radosgw-admin DESTINATION bin)
 
 set(radosgw_es_srcs

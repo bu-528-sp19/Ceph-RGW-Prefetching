@@ -22,6 +22,8 @@
 
 #include "include/lru.h" /*engage1*/
 #include "rgw_threadpool.h"
+#include <cpp_redis/cpp_redis>
+
 
 enum {
   UPDATE_OBJ,

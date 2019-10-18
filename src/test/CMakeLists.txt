@@ -2,6 +2,7 @@ include(AddCephTest)
 
 set(UNITTEST_LIBS GMock::Main GMock::GMock GTest::GTest ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
 
+#add_library(cpp_redis OBJECT ${CPP_REDIS_LIBRARIES})
 add_library(unit-main OBJECT unit.cc)
 target_include_directories(unit-main PRIVATE
   $<TARGET_PROPERTY:GTest::GTest,INTERFACE_INCLUDE_DIRECTORIES>)
