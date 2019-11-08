@@ -920,8 +920,8 @@ int RGWDataCache<T>::iterate_obj(RGWObjectCtx& obj_ctx,
 
   /*** AMIN CODE START ***/
 
-  if (((get_obj_data *)arg)->obj_size > (end+1))
-    data_cache.issue_prefetch((get_obj_data *)arg, end, ((get_obj_data *)arg)->obj_size - end);
+//  if (((get_obj_data *)arg)->obj_size > (end+1))
+//    data_cache.issue_prefetch((get_obj_data *)arg, end, ((get_obj_data *)arg)->obj_size - end);
 
   /*** AMIN CODE END ***/
 
@@ -981,7 +981,7 @@ int RGWDataCache<T>::get_obj_iterate_cb(RGWObjectCtx *ctx, RGWObjState *astate,
   RGWObjectCtx *rctx = static_cast<RGWObjectCtx *>(ctx);
   librados::ObjectReadOperation op;
   struct get_obj_data *d = (struct get_obj_data *)arg;
-  string oid, key;
+  string oid, key,dest;
   bufferlist *pbl;
   librados::AioCompletion *c;
 
@@ -1040,7 +1040,8 @@ int RGWDataCache<T>::get_obj_iterate_cb(RGWObjectCtx *ctx, RGWObjState *astate,
     if (r != 0 ){
       mydout(0) << "Error cache_aio_read failed err=" << r << dendl;
    }
-  } else { // if  (d->deterministic_hash_is_local(oid)){
+  } 
+  else if  (d->deterministic_hash_is_local(read_obj.oid )){
     mydout(20) << "rados->get_obj_iterate_cb oid=" << read_obj.oid << " obj-ofs=" << obj_ofs << " read_ofs=" << read_ofs << " len=" << len << dendl;
     op.read(read_ofs, len, pbl, NULL);
 
@@ -1053,12 +1054,14 @@ int RGWDataCache<T>::get_obj_iterate_cb(RGWObjectCtx *ctx, RGWObjState *astate,
       mydout(0) << "rados->aio_operate r=" << r << dendl;
       goto done_err;
     }
-  } /* else {
+  } 
+   else {
     librados::L2CacheRequest *cc;
-    d->add_l2_request(&cc, pbl, oid, obj_ofs, read_ofs, len, key, c);
-    r = d->add_cache_notifier(oid, c);
+    d->add_l2_request(&cc, pbl, read_obj.oid, obj_ofs, read_ofs, len, key, c);
+    //r = d->add_cache_notifier(read_obj.oid, c);
+    r = io_ctx.cache_aio_notifier(read_obj.oid, cc);
     data_cache.push_l2_request(cc);
-  }*/
+  }
   
 
   // Flush data to client if there is any
