@@ -2326,7 +2326,7 @@ RGWOp *RGWHandler_REST_Service_SWIFT::op_post()
 
 RGWOp *RGWHandler_REST_Service_SWIFT::op_delete()
 {
-  if (s->info.args.exists("bulk-delete")) {
+  if ((s->info.args.exists("bulk-delete")) || (s->op == OP_KARIZ_FLUSH_CACHE)) {
     return new RGWBulkDelete_ObjStore_SWIFT;
   }
   return NULL;

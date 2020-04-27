@@ -411,6 +411,21 @@ void DataCache::evict_object(string bucket_name, string object_name){
     }
 }
 
+void DataCache::flush_cache(){
+    ldout(cct, 0) << "INFO: Kazir flush cache " << dendl;
+    string location = cct->_conf->rgw_datacache_persistent_path;
+
+    /*Evict every rados object we have in the cache*/
+    //remove(location.c_str()); /*remove physically*/
+    system("exec rm -r /tmp/*");
+    eviction_lock.Lock();
+    cache_map.clear();
+    init(cct); 
+    eviction_lock.Unlock();
+}
+
+
+
 int DataCache::io_write(bufferlist& bl ,unsigned int len, std::string oid) {
 
   ChunkDataInfo*  chunk_info = new ChunkDataInfo;

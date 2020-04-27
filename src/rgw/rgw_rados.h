@@ -3311,6 +3311,7 @@ public:
   /*** AMIN CODE END ***/
   /*KARIZ S*/
   virtual void evict_object(const string bucket_name, const string object_name) {}
+  virtual void kariz_clear_cache() {};
   /*KARIZ E*/
 
   int append_atomic_test(RGWObjectCtx *rctx, const RGWBucketInfo& bucket_info, const rgw_obj& obj,

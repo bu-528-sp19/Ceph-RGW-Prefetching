@@ -1810,6 +1810,13 @@ void RGWGetObj::execute()
 
   perfcounter->inc(l_rgw_get);
 
+  /*FLUSH Cache*/
+  //if (s->info.env->get("HTTP_KARIZ_FLUSH_CACHE")) {
+  //   store->kariz_clear_cache();
+  //   send_response_data(bl, 0, 0);
+  //   return;
+  //}
+
   RGWRados::Object op_target(store, s->bucket_info, *static_cast<RGWObjectCtx *>(s->obj_ctx), obj);
   RGWRados::Object::Read read_op(&op_target);
 

@@ -1661,6 +1661,9 @@ RGWOp* RGWHandler_REST::get_op(RGWRados* store)
    case OP_KARIZ_EVICT:
      op = op_delete();
      break;
+   case OP_KARIZ_FLUSH_CACHE:
+     op = op_delete();
+     break;
    case OP_HEAD:
      op = op_head();
      break;
@@ -2224,6 +2227,10 @@ int RGWREST::preprocess(struct req_state *s, rgw::io::BasicClient* cio)
   
   if ((s->op == OP_DELETE) && (info.env->get("HTTP_KARIZ_EVICT"))) { /*Kariz KARIZ*/ 
      s->op = OP_KARIZ_EVICT;
+  }
+
+  if ((s->op == OP_DELETE) && (info.env->get("HTTP_KARIZ_FLUSH_CACHE"))) { /*Kariz KARIZ*/
+     s->op = OP_KARIZ_FLUSH_CACHE;
   }
 
 

@@ -186,6 +186,12 @@ int process_request(RGWRados* const store,
      goto done;
   }
 
+  if (s->op == OP_KARIZ_FLUSH_CACHE){
+     store->kariz_clear_cache();
+     goto done;
+  }
+
+
   s->op_type = op->get_type();
 
   ldpp_dout(op, 2) << "verifying requester" << dendl;

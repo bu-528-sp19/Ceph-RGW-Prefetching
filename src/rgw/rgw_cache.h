@@ -52,23 +52,33 @@ struct KarizBlockInfo {
 };
 
 struct ChunkDataInfo : public LRUObject {
-	CephContext *cct;
-	uint64_t size;
-	time_t access_time;
-	string address;
-	string oid;
-	bool complete;
-	struct ChunkDataInfo *lru_prev;
-	struct ChunkDataInfo *lru_next;	
+   CephContext *cct;
+   uint64_t size;
+   time_t access_time;
+   string address;
+   string oid;
+   bool complete;
+   struct ChunkDataInfo *lru_prev;
+   struct ChunkDataInfo *lru_next;	
+   
+   ChunkDataInfo(): size(0) {}
+   
+   ~ChunkDataInfo() {
+      if (lru_prev) {
+         lru_prev->lru_next = lru_next;
+      }
+   
+      if (lru_next) {
+         lru_next->lru_prev = lru_prev;
+      }
+   }
 
-	ChunkDataInfo(): size(0) {}
-
-	void set_ctx(CephContext *_cct) {
-		cct = _cct;
-	}
-
-	void dump(Formatter *f) const;
-	static void generate_test_instances(list<ChunkDataInfo*>& o);
+   void set_ctx(CephContext *_cct) {
+      cct = _cct;
+   }
+   
+   void dump(Formatter *f) const;
+   static void generate_test_instances(list<ChunkDataInfo*>& o);
 };
 
 struct cacheAioWriteRequest{
@@ -128,6 +138,8 @@ public:
   ~DataCache() {}
 
   void evict_object(string bucket_name, string object_name);
+  void flush_cache();
+
   bool get(string oid);
   void put(bufferlist& bl, unsigned int len, string obj_key, string bucket_name, string object_name);
   int io_write(bufferlist& bl, unsigned int len, std::string oid);
@@ -143,8 +155,9 @@ public:
   void l2_http_request(off_t ofs , off_t len, std::string oid);
   void init(CephContext *_cct) {
     cct = _cct;
-    
-    free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 17179869184 : cct->_conf->rgw_datacache_size;
+   
+    free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 53687091200 : cct->_conf->rgw_datacache_size; 
+    //free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 17179869184 : cct->_conf->rgw_datacache_size;
     //free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 4294967296 : cct->_conf->rgw_datacache_size;
     head = NULL;
     tail = NULL;
@@ -412,6 +425,7 @@ public:
   }
 
   virtual void evict_object(const string bucket_name, const string object_name) {}
+  virtual void kariz_clear_cache() {}
 
 
   int system_obj_set_attrs(void *ctx, rgw_raw_obj& obj, 
@@ -849,6 +863,8 @@ public:
                                                 RGWObjState *, void *),
 	                  void *arg);
   void evict_object(const string bucket_name, const string object_name);
+  virtual void kariz_clear_cache();
+
   /*** AMIN CODE END ***/
 
   int flush_read_list(struct get_obj_data *d);
@@ -896,8 +912,8 @@ int RGWDataCache<T>::iterate_obj(RGWObjectCtx& obj_ctx,
   //FIXME: ask MATT: how can we find out if the request is the metadata or data?
   /*** AMIN CODE START ***/
 
-  if (((get_obj_data *)arg)->obj_size > (end+1))
-    data_cache.issue_prefetch((get_obj_data *)arg, end, ((get_obj_data *)arg)->obj_size - end);
+  //if (((get_obj_data *)arg)->obj_size > (end+1))
+  //  data_cache.issue_prefetch((get_obj_data *)arg, end, ((get_obj_data *)arg)->obj_size - end);
 
   /*** AMIN CODE END ***/
 
@@ -995,6 +1011,12 @@ template<typename T>
 void RGWDataCache<T>::evict_object(const string bucket_name, const string object_name) {
     mydout(0) << "KARIZ Evict file" << dendl; 
     data_cache.evict_object(bucket_name, object_name);
+}
+
+template<typename T>
+void RGWDataCache<T>::kariz_clear_cache() {
+    mydout(0) << "Kariz flush Cache" << dendl;
+    data_cache.flush_cache();
 }
 
 
