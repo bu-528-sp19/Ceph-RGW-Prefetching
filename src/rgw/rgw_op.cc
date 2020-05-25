@@ -6222,6 +6222,18 @@ void RGWBulkDelete::pre_exec()
 
 void RGWBulkDelete::execute()
 {
+    if (s->op == OP_KARIZ_EVICT){
+     store->evict_object(s->init_state.url_bucket, s->object.name);
+     return;
+  }
+
+  if (s->op == OP_KARIZ_FLUSH_CACHE){
+     bufferlist bl;
+     store->kariz_clear_cache();
+     return;
+  }
+
+
   deleter = std::unique_ptr<Deleter>(new Deleter(this, store, s));
 
   bool is_truncated = false;

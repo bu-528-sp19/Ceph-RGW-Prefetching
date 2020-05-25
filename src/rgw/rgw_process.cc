@@ -181,15 +181,19 @@ int process_request(RGWRados* const store,
   req->op = op;
   dout(10) << "op=" << typeid(*op).name() << dendl;
   
-  if (s->op == OP_KARIZ_EVICT){
+  /*if (s->op == OP_KARIZ_EVICT){
+     abort_early(s, op, 0, handler);
      store->evict_object(s->init_state.url_bucket, s->object.name);
      goto done;
   }
 
   if (s->op == OP_KARIZ_FLUSH_CACHE){
+     bufferlist bl;
      store->kariz_clear_cache();
-     goto done;
-  }
+     //send_response_data(bl, 0, 0);
+     //abort_early(s, op, 0, handler);
+     //goto done;
+  }*/
 
 
   s->op_type = op->get_type();

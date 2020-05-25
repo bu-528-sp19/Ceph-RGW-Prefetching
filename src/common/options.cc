@@ -6296,7 +6296,7 @@ std::vector<Option> get_rgw_options() {
     .set_description(""),
 
     Option("rgw_datacache_persistent_path", Option::TYPE_STR, Option::LEVEL_ADVANCED)
-    .set_default("/tmp")
+    .set_default("/local0")
     .set_description(""),
 
     Option("rgw_datacache_size", Option::TYPE_UINT, Option::LEVEL_ADVANCED)

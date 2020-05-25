@@ -4,6 +4,7 @@
 #ifndef CEPH_RGWCACHE_H
 #define CEPH_RGWCACHE_H
 
+#include "include/rados/librados.hpp"
 #include "rgw_rados.h"
 #include <string>
 #include <map>
@@ -25,6 +26,7 @@
 #include "rgw_threadpool.h"
 #include "rgw_common.h"
 #include "rgw_op.h"
+
 
 
 enum {
@@ -156,7 +158,7 @@ public:
   void init(CephContext *_cct) {
     cct = _cct;
    
-    free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 53687091200 : cct->_conf->rgw_datacache_size; 
+    free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 214748364800 : cct->_conf->rgw_datacache_size; // 200GB
     //free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 17179869184 : cct->_conf->rgw_datacache_size;
     //free_data_cache_size = (cct->_conf->rgw_datacache_size == -1) ? 4294967296 : cct->_conf->rgw_datacache_size;
     head = NULL;

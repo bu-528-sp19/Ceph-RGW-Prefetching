@@ -417,8 +417,17 @@ void DataCache::flush_cache(){
 
     /*Evict every rados object we have in the cache*/
     //remove(location.c_str()); /*remove physically*/
-    system("exec rm -r /tmp/*");
+    //system("exec rm -r /tmp/*");
     eviction_lock.Lock();
+    for (auto iter: cache_map) {
+        string oid = iter.first;
+        remove((location + oid).c_str()); /*remove file from location*/
+        struct ChunkDataInfo *chdo = iter.second;
+        lru_remove(chdo);
+        free(chdo);
+    }
+
+
     cache_map.clear();
     init(cct); 
     eviction_lock.Unlock();
@@ -671,10 +680,10 @@ size_t DataCache::lru_eviction(){
 
   cache_lock.Lock();
   n_entries = cache_map.size();
-  if (n_entries <= 0){
+  if (n_entries <= 0) {
     cache_lock.Unlock();
     return -1;
-    }
+  }
   del_oid = del_entry->oid;
   ldout(cct, 20) << "Engage1: lru_eviction: oid to remove" << del_oid << dendl;
   map<string, ChunkDataInfo*>::iterator iter = cache_map.find(del_entry->oid);

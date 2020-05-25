@@ -3845,6 +3845,7 @@ public:
 
 };
 
+
 class librados::CacheRequest {
   public:
     Mutex lock;

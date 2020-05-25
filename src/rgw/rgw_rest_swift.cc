@@ -1180,6 +1180,20 @@ void RGWPutMetadataObject_ObjStore_SWIFT::send_response()
   rgw_flush_formatter_and_reset(s, s->formatter);
 }
 
+static void cacheflush_respond(const int prot_flags,                  /* in  */
+                               ceph::Formatter& formatter)            /* out */
+{
+  formatter.open_object_section("delete");
+
+  string resp_status;
+  string resp_body;
+  dump_errno(200, resp_status);
+  encode_json("Cache status", "empty", &formatter);
+  formatter.close_section();
+
+}
+
+
 static void bulkdelete_respond(const unsigned num_deleted,
                                const unsigned int num_unfound,
                                const std::list<RGWBulkDelete::fail_desc_t>& failures,
@@ -1644,11 +1658,22 @@ void RGWBulkDelete_ObjStore_SWIFT::send_response()
   end_header(s, this /* RGWOp */, nullptr /* contype */,
              CHUNKED_TRANSFER_ENCODING);
 
-  bulkdelete_respond(deleter->get_num_deleted(),
+
+  if (s->op == OP_KARIZ_EVICT){
+     cacheflush_respond(s->prot_flags,
+                     *s->formatter);
+
+  } else if (s->op == OP_KARIZ_FLUSH_CACHE){
+     cacheflush_respond(s->prot_flags,
+                     *s->formatter);
+  } else {
+
+     bulkdelete_respond(deleter->get_num_deleted(),
                      deleter->get_num_unfound(),
                      deleter->get_failures(),
                      s->prot_flags,
                      *s->formatter);
+  }
   rgw_flush_formatter_and_reset(s, s->formatter);
 }
 
